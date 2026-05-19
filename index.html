@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Candidate Registration</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 50px; background-color: #f4f6f9; }
+        form { background: white; padding: 20px; border-radius: 8px; max-width: 400px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background-color: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; width: 100%; }
+        button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+
+    <h2>Candidate Registration</h2>
+    
+    <form id="regForm">
+        <div class="input-group">
+            <label>Full Name</label>
+            <input type="text" id="name" required>
+        </div>
+        <div class="input-group">
+            <label>Email</label>
+            <input type="email" id="email" required>
+        </div>
+        <div class="input-group">
+            <label>Phone Number</label>
+            <input type="text" id="phone" required>
+        </div>
+        <div class="input-group">
+            <label>Skills</label>
+            <input type="text" id="skills" placeholder="e.g. HTML, CSS, JS" required>
+        </div>
+        <button type="submit">Submit Details</button>
+    </form>
+
+    <script>
+        // PASTE YOUR GOOGLE WEB APP URL HERE
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwSAQ386rM0rEQHvDNVRFCApjN9r320fV14uSTj2mlS0sbwdSt-yHrMxVMdVAPNsTOBKQ/exec";
+
+        document.getElementById('regForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevents page reload
+            
+            // Gather the data from the input fields
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                skills: document.getElementById('skills').value
+            };
+
+            // Send data using Javascript fetch API
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                mode: 'no-cors', // Avoids cross-origin issues with Apps Script
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                alert('Data Sent Successfully! Check your Google Sheet.');
+                document.getElementById('regForm').reset(); // Clear form
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Something went wrong!');
+            });
+        });
+    </script>
+</body>
+</html>

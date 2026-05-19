@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Placement Drive Portal</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; }
+        body { background: #f3f4f6; color: #333; display: flex; flex-direction: column; min-height: 100vh; }
+        
+        /* Navigation / Header */
+        header { background: #1e3a8a; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .logout-btn { background: #ef4444; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; display: none; }
+        
+        /* Layout Containers */
+        .container { padding: 30px; max-width: 1200px; margin: 0 auto; width: 100%; }
+        .view-panel { display: none; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .active-view { display: block; }
+
+        /* Login Screen Styles */
+        .login-card { max-width: 400px; margin: 80px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); text-align: center; }
+        .role-btn { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #3b82f6; background: transparent; color: #3b82f6; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+        .role-btn:hover { background: #3b82f6; color: white; }
+
+        /* Admin Dashboard Components */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: #eff6ff; border-left: 5px solid #3b82f6; padding: 20px; border-radius: 6px; }
+        .stat-card h3 { color: #1e40af; font-size: 14px; text-transform: uppercase; margin-bottom: 5px; }
+        .stat-card p { font-size: 28px; font-weight: bold; }
+        
+        /* Responsive Table */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        th { background: #f8fafc; color: #475569; }
+
+        /* Job Drive Card Layout Styles */
+.drive-card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: transform 0.2s, box-shadow 0.2s; }
+.drive-card:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.drive-card h4 { color: #1e293b; font-size: 18px; margin-bottom: 5px; }
+.drive-card .company-badge { display: inline-block; background: #dbeafe; color: #1e40af; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-bottom: 12px; }
+.drive-card p { font-size: 14px; color: #475569; margin-bottom: 8px; line-height: 1.4; }
+.apply-btn { width: 100%; background: #3b82f6; color: white; border: none; padding: 10px; margin-top: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+.apply-btn:hover { background: #2563eb; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h2 id="portalTitle">Placement Portal</h2>
+        <button id="logoutBtn" class="logout-btn" onclick="logout()">Logout</button>
+    </header>
+
+    <div class="container">
+        
+        <div id="loginView" class="view-panel active-view">
+            <div class="login-card">
+                <h2>Welcome to the Portal</h2>
+                <p style="color: #64748b; margin-bottom: 20px;">Select your workspace role to enter</p>
+                <button class="role-btn" onclick="switchView('adminView', 'Admin Dashboard')">Enter Admin Control</button>
+                <button class="role-btn" onclick="switchView('companyView', 'Company Workspace')">Enter HR Portal</button>
+                <button class="role-btn" onclick="switchView('candidateView', 'Candidate Portal')">Enter Candidate Space</button>
+            </div>
+        </div>
+
+        <div id="adminView" class="view-panel">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Registered Candidates</h3>
+                    <p id="totalCandidatesCount">0</p>
+                </div>
+                <div class="stat-card" style="border-left-color: #10b981;">
+                    <h3>Active Drives</h3>
+                    <p>0</p>
+                </div>
+            </div>
+            
+            <h3>Live Candidate Database</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Skills</th>
+                    </tr>
+                </thead>
+                <tbody id="candidateTableBody">
+                    <tr><td colspan="4" style="text-align:center; color:#94a3b8;">Loading spreadsheet metrics...</td></tr>
+                </tbody>
+            </table>
+            <br><br>
+<h3>Live Application Submissions</h3>
+<table>
+    <thead>
+        <tr>
+            <th>Date Logged</th>
+            <th>Candidate Name</th>
+            <th>Target Corporation</th>
+            <th>Designation Role</th>
+            <th>Tracking Status</th>
+        </tr>
+    </thead>
+    <tbody id="applicationsTableBody">
+        <tr><td colspan="5" style="text-align:center; color:#94a3b8;">Loading workspace metrics...</td></tr>
+    </tbody>
+</table>
+
+        </div>
+
+        <div id="companyView" class="view-panel">
+    <div style="max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #1e3a8a; margin-bottom: 5px;">Create a Placement Drive</h2>
+        <p style="color: #64748b; margin-bottom: 25px;">Fill out the parameters below to open an application drive for candidates.</p>
+        
+        <form id="driveForm">
+            <input type="hidden" id="actionType" value="postDrive">
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                <div>
+                    <label style="display:block; margin-bottom:5px; font-weight:bold;">Company Name</label>
+                    <input type="text" id="compName" style="width:100%; padding:10px; border:1fr solid #ccc; border-radius:4px;" required>
+                </div>
+                <div>
+                    <label style="display:block; margin-bottom:5px; font-weight:bold;">HR Recruiter Name</label>
+                    <input type="text" id="hrName" style="width:100%; padding:10px; border:1fr solid #ccc; border-radius:4px;" required>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px; font-weight:bold;">Job Title Role</label>
+                <input type="text" id="jobTitle" placeholder="e.g. Associate Software Engineer" style="width:100%; padding:10px; border:1fr solid #ccc; border-radius:4px;" required>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px; font-weight:bold;">Eligibility Criteria</label>
+                <input type="text" id="eligibility" placeholder="e.g. B.E / B.Tech (No active backlogs), Min 60% in 10th/12th" style="width:100%; padding:10px; border:1fr solid #ccc; border-radius:4px;" required>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display:block; margin-bottom:5px; font-weight:bold;">Job Description & Skill Requirements</label>
+                <textarea id="jobDesc" rows="5" placeholder="Describe the day-to-day operations, core tech stacks, packages, and bonds if applicable..." style="width:100%; padding:10px; border:1fr solid #ccc; border-radius:4px; font-family:inherit;" required></textarea>
+            </div>
+
+            <button type="submit" style="background:#10b981; color:white; padding:12px 20px; border:none; border-radius:4px; font-weight:bold; cursor:pointer; width:100%;">Publish Active Drive</button>
+        </form>
+    </div>
+</div>
+
+        <div id="candidateView" class="view-panel">
+    <h2 style="color: #1e3a8a; margin-bottom: 5px;">Available Placement Drives</h2>
+    <p style="color: #64748b; margin-bottom: 25px;">Explore open profiles and submit your credentials directly to active HR pools.</p>
+    
+    <div id="drivesGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+        <p id="loadingDrivesText" style="color: #94a3b8;">Loading open positions from the spreadsheet database...</p>
+    </div>
+</div>
+
+    </div>
+
+    <script>
+        // PASTE YOUR SAME GOOGLE WEB APP URL HERE
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwSAQ386rM0rEQHvDNVRFCApjN9r320fV14uSTj2mlS0sbwdSt-yHrMxVMdVAPNsTOBKQ/exec";
+
+        // View Routing Engine
+        function switchView(viewId, titleText) {
+    document.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active-view'));
+    document.getElementById(viewId).classList.add('active-view');
+    document.getElementById('portalTitle').innerText = titleText;
+    
+    if (viewId === 'loginView') {
+        document.getElementById('logoutBtn').style.display = 'none';
+    } else {
+        document.getElementById('logoutBtn').style.display = 'block';
+    }
+
+    // Dynamic fetch trigger checks
+    if (viewId === 'adminView') {
+        fetchAdminMetrics();
+    } else if (viewId === 'candidateView') {
+        fetchActiveDrives(); // New Trigger for Candidate Space!
+    }
+}
+
+        function logout() {
+            switchView('loginView', 'Placement Portal');
+        }
+
+        // Fetch Spreadsheet Rows for Admin Table View
+     // Upgraded Admin Dashboard Metrics Compiler
+        // Upgraded Admin Dashboard Metrics Compiler
+function fetchAdminMetrics() {
+    // Fetch Candidate List
+    fetch(WEB_APP_URL + "?target=Candidates")
+        .then(res => res.json())
+        .then(res => {
+            if (res.status === 'success') {
+                const candidates = res.data;
+                document.getElementById('totalCandidatesCount').innerText = candidates.length;
+                let tableHTML = '';
+                candidates.forEach(user => {
+                    tableHTML += `<tr><td><strong>${user.name||'-'}</strong></td><td>${user.email||'-'}</td><td>${user.phone||'-'}</td><td>${user.skills||'-'}</td></tr>`;
+                });
+                document.getElementById('candidateTableBody').innerHTML = tableHTML;
+            }
+        });
+
+    // Fetch Application Records
+    fetch(WEB_APP_URL + "?target=Applications")
+        .then(res => res.json())
+        .then(res => {
+            if (res.status === 'success') {
+                const apps = res.data;
+                let appHTML = '';
+                if (apps.length === 0) {
+                    appHTML = `<tr><td colspan="5" style="text-align:center;">No job applications submitted yet.</td></tr>`;
+                } else {
+                    apps.forEach(item => {
+                        // Format the Google timestamp neatly
+                        let dateObj = new Date(item.timestamp);
+                        let formattedDate = dateObj.toLocaleDateString();
+
+                        appHTML += `
+                            <tr>
+                                <td>${formattedDate}</td>
+                                <td><strong>${item.candidate_name || '-'}</strong></td>
+                                <td>${item.company_name || '-'}</td>
+                                <td>${item.job_title || '-'}</td>
+                                <td><span style="background:#fef3c7; color:#d97706; padding:3px 8px; border-radius:4px; font-size:12px; font-weight:bold;">${item.application_status || 'Applied'}</span></td>
+                            </tr>
+                        `;
+                    });
+                }
+                document.getElementById('applicationsTableBody').innerHTML = appHTML;
+            }
+        })
+        .catch(err => {
+            console.error("Dashboard engine failure:", err);
+        });
+}
+
+        // Company Drive Posting Handler
+document.getElementById('driveForm').addEventListener('submit', function(e) {
+    e.preventDefault(); // Stop page from refreshing
+    
+    // Bundle form data together with our specific action identifier
+    const drivePayload = {
+        action: document.getElementById('actionType').value,
+        companyName: document.getElementById('compName').value,
+        hrName: document.getElementById('hrName').value,
+        jobTitle: document.getElementById('jobTitle').value,
+        eligibility: document.getElementById('eligibility').value,
+        description: document.getElementById('jobDesc').value
+    };
+
+    // Send the structured payload out to Apps Script
+    fetch(WEB_APP_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(drivePayload)
+    })
+    .then(response => {
+        alert('Placement Drive Published Successfully! Logged to Spreadsheet Database.');
+        document.getElementById('driveForm').reset(); // Empty fields
+        switchView('loginView', 'Placement Portal'); // Route safely back to core portal
+    })
+    .catch(error => {
+        console.error('Submission failure:', error);
+        alert('Unable to transmit data packet.');
+    });
+});
+
+// Fetch Active Job Openings for Candidates
+function fetchActiveDrives() {
+    // Note how we pass '?target=Drives' to our Web App URL string
+    fetch(WEB_APP_URL + "?target=Drives")
+        .then(response => response.json())
+        .then(res => {
+            if (res.status === 'success') {
+                const drives = res.data;
+                let gridHTML = '';
+                
+                if (drives.length === 0) {
+                    gridHTML = `<p style="grid-column: 1/-1; text-align:center; color:#94a3b8; padding: 40px 0;">No active recruitment drives found at this time.</p>`;
+                } else {
+                    drives.forEach(drive => {
+                        // Match keys to columns (spaces in spreadsheet headers became underscores)
+                        gridHTML += `
+                            <div class="drive-card">
+                                <h4>${drive.job_title || 'Open Position'}</h4>
+                                <span class="company-badge">${drive.company_name || 'Anonymous Recruiter'}</span>
+                                <p><strong>Eligibility:</strong> ${drive.eligibility || 'Open to all'}</p>
+                                <p><strong>Description:</strong> ${drive.job_description || 'Click apply to view more details regarding this opportunity.'}</p>
+                                <p style="font-size:12px; color:#94a3b8; margin-top:10px;">Contact HR: ${drive.hr_name || 'N/A'}</p>
+                                <button class="apply-btn" onclick="applyToDrive('${drive.company_name}', '${drive.job_title}')">Quick Apply</button>
+                            </div>
+                        `;
+                    });
+                }
+                document.getElementById('drivesGrid').innerHTML = gridHTML;
+            }
+        })
+        .catch(err => {
+            console.error("Failed to load drives:", err);
+            document.getElementById('drivesGrid').innerHTML = `<p style="grid-column: 1/-1; text-align:center; color:#ef4444;">Error fetching live drives from database.</p>`;
+        });
+}
+
+// Temporary Placeholder click action for apply button
+// Active Application Submission Engine
+function applyToDrive(companyName, jobTitle) {
+    // Ask the user for their name to identify them in the database
+    let candidateName = prompt("Please enter your Full Name to confirm your application submission:");
+    
+    if (!candidateName || candidateName.trim() === "") {
+        alert("Application cancelled. Valid candidate identification name required.");
+        return;
+    }
+
+    // Pack the data payload tightly
+    const applicationPayload = {
+        action: "submitApplication",
+        candidateName: candidateName.trim(),
+        companyName: companyName,
+        jobTitle: jobTitle
+    };
+
+    // Send the package to your Apps Script
+    fetch(WEB_APP_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(applicationPayload)
+    })
+    .then(response => {
+        alert(`Success! You have officially applied to ${companyName} for the ${jobTitle} position.`);
+    })
+    .catch(error => {
+        console.error("Submission failure:", error);
+        alert("An error occurred while transmitting your job application.");
+    });
+}
+    </script>
+</body>
+</html>
