@@ -1,0 +1,227 @@
+/* Core Configurations */
+* { 
+    box-sizing: border-box; 
+    font-family: 'Segoe UI', Arial, sans-serif; 
+    margin: 0; 
+    padding: 0; 
+}
+body { 
+    background: #f3f4f6; 
+    color: #333; 
+    display: flex; 
+    flex-direction: column; 
+    min-height: 100vh; 
+}
+
+/* Header UI Elements */
+header { 
+    background: #1e3a8a; 
+    color: white; 
+    padding: 15px 30px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+}
+.logout-btn { 
+    background: #ef4444; 
+    color: white; 
+    border: none; 
+    padding: 8px 15px; 
+    border-radius: 4px; 
+    cursor: pointer; 
+    display: none; 
+    font-weight: bold;
+}
+
+/* Page Layout Systems */
+.container { 
+    padding: 30px; 
+    max-width: 1200px; 
+    margin: 0 auto; 
+    width: 100%; 
+}
+.view-panel { 
+    display: none; 
+    background: white; 
+    padding: 25px; 
+    border-radius: 8px; 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+}
+.active-view { 
+    display: block; 
+}
+.subtitle {
+    color: #64748b;
+}
+
+/* Gate Portal Selector Login UI */
+.login-card { 
+    max-width: 400px; 
+    margin: 80px auto; 
+    background: white; 
+    padding: 30px; 
+    border-radius: 8px; 
+    box-shadow: 0 10px 15px rgba(0,0,0,0.1); 
+    text-align: center; 
+}
+.role-btn { 
+    width: 100%; 
+    padding: 12px; 
+    margin: 10px 0; 
+    border: 2px solid #3b82f6; 
+    background: transparent; 
+    color: #3b82f6; 
+    font-size: 16px; 
+    font-weight: bold; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    transition: 0.2s; 
+}
+.role-btn:hover { 
+    background: #3b82f6; 
+    color: white; 
+}
+
+/* Admin Metric Top Grid Layout */
+.stats-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+    gap: 20px; 
+    margin-bottom: 30px; 
+}
+.stat-card { 
+    padding: 20px; 
+    border-radius: 6px; 
+}
+.unique-blue-card {
+    background: #eff6ff; 
+    border-left: 5px solid #3b82f6; 
+}
+.unique-green-card {
+    background: #ecfdf5; 
+    border-left: 5px solid #10b981; 
+}
+.stat-card h3 { 
+    color: #475569; 
+    font-size: 14px; 
+    text-transform: uppercase; 
+    margin-bottom: 5px; 
+}
+.stat-card p { 
+    font-size: 28px; 
+    font-weight: bold; 
+}
+
+/* Responsive UI Tables */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 15px;
+}
+table { 
+    width: 100%; 
+    border-collapse: collapse; 
+}
+th, td { 
+    padding: 12px; 
+    text-align: left; 
+    border-bottom: 1px solid #e5e7eb; 
+}
+th { 
+    background: #f8fafc; 
+    color: #475569; 
+}
+.text-center { text-align: center; }
+.placeholder-text { color: #94a3b8; }
+
+/* Company Form Fields Configurations */
+.form-wrapper {
+    max-width: 600px; 
+    margin: 0 auto;
+}
+.form-title { color: #1e3a8a; margin-bottom: 5px; }
+.form-row {
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 15px; 
+}
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+.form-group input, .form-group textarea {
+    width: 100%; 
+    padding: 10px; 
+    border: 1px solid #ccc; 
+    border-radius: 4px;
+}
+.form-group textarea { font-family: inherit; resize: vertical; }
+.submit-btn {
+    background: #10b981; 
+    color: white; 
+    padding: 12px 20px; 
+    border: none; 
+    border-radius: 4px; 
+    font-weight: bold; 
+    cursor: pointer; 
+    width: 100%;
+}
+.submit-btn:hover { background: #059669; }
+
+/* Candidate Drive Card Display Grid */
+.drives-grid {
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+    gap: 20px;
+}
+.drive-card { 
+    background: #ffffff; 
+    border: 1px solid #e5e7eb; 
+    border-radius: 8px; 
+    padding: 20px; 
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02); 
+    transition: transform 0.2s, box-shadow 0.2s; 
+}
+.drive-card:hover { 
+    transform: translateY(-3px); 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
+}
+.drive-card h4 { color: #1e293b; font-size: 18px; margin-bottom: 5px; }
+.drive-card .company-badge { 
+    display: inline-block; 
+    background: #dbeafe; 
+    color: #1e40af; 
+    padding: 3px 8px; 
+    border-radius: 4px; 
+    font-size: 12px; 
+    font-weight: bold; 
+    margin-bottom: 12px; 
+}
+.drive-card p { font-size: 14px; color: #475569; margin-bottom: 8px; line-height: 1.4; }
+.apply-btn { 
+    width: 100%; 
+    background: #3b82f6; 
+    color: white; 
+    border: none; 
+    padding: 10px; 
+    margin-top: 10px; 
+    border-radius: 4px; 
+    font-weight: bold; 
+    cursor: pointer; 
+}
+.apply-btn:hover { background: #2563eb; }
+
+/* Add this to your style.css file */
+.login-submit-btn {
+    width: 100%;
+    background: #1e3a8a;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+}
+.login-submit-btn:hover {
+    background: #1e40af;
+}
