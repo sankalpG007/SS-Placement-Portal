@@ -225,3 +225,55 @@ th {
 .login-submit-btn:hover {
     background: #1e40af;
 }
+
+/* ================= SLEEK MODERN SEARCH BAR STYLING ================= */
+
+.search-container {
+    width: 100%;
+    margin: 15px 0 25px 0;
+    position: relative;
+}
+
+.search-container input[type="text"] {
+    width: 100%;
+    padding: 14px 16px 14px 44px; /* Room on the left for the search icon */
+    font-size: 15px;
+    color: #1e293b;
+    background-color: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.25s ease-in-out;
+    outline: none;
+    box-sizing: border-box;
+}
+
+/* Smooth Focus State: Glow effect when clicked */
+.search-container input[type="text"]:focus {
+    border-color: #3b82f6;
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15), 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+/* Styled Placeholder Text */
+.search-container input[type="text"]::placeholder {
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+/* Adding an absolute positioned vector icon slot */
+.search-container::before {
+    content: "🔍";
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: #94a3b8;
+    pointer-events: none; /* Ensures clicking the emoji focuses the input box */
+}
+
+/* Hover style to make it interactive */
+.search-container input[type="text"]:hover {
+    border-color: #cbd5e1;
+}

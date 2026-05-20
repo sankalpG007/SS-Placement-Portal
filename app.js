@@ -190,6 +190,7 @@ function fetchCandidatesForHR() {
                 document.getElementById('hrCandidateTableBody').innerHTML = tableHTML || `<tr><td colspan='4' class='text-center'>No candidates signed up yet.</td></tr>`;
             }
         });
+        updateSearchSuggestions('hrCandidateTableBody', 'hrNameSuggestions');
 }
 
 function fetchAdminMetrics() {
@@ -216,6 +217,8 @@ function fetchAdminMetrics() {
                 `;
             });
             document.getElementById('candidateTableBody').innerHTML = tableHTML;
+
+            updateSearchSuggestions('candidateTableBody', 'adminNameSuggestions');
         }
     });
 
@@ -290,3 +293,84 @@ function applyToDrive(companyName, jobTitle) {
     .then(() => alert(`Success! Application submitted for ${jobTitle} role at ${companyName}.`))
     .catch(err => alert("Pipeline connection error."));
 }
+
+// ================= UPGRADED SEARCH ENGINE WITH AUTO-SUGGESTIONS =================
+
+// Helper function to build autocomplete suggestion lists dynamically
+function updateSearchSuggestions(tableBodyId, dataListId) {
+    const rows = document.querySelectorAll(`#${tableBodyId} tr`);
+    const datalist = document.getElementById(dataListId);
+    if (!datalist) return;
+    
+    // Clear old suggestions
+    datalist.innerHTML = "";
+    
+    let names = [];
+    rows.forEach(row => {
+        if (row.querySelector('.placeholder-text')) return;
+        // The first cell (index 0) contains the candidate's name
+        const nameCell = row.cells[0];
+        if (nameCell) {
+            const name = nameCell.textContent.trim();
+            if (name && !names.includes(name)) {
+                names.push(name);
+                const option = document.createElement('option');
+                option.value = name;
+                datalist.appendChild(option);
+            }
+        }
+    });
+}
+
+// Generic partial matcher that only reads columns 1 to 4 (ignores the resume code)
+function runTargetedSearch(searchInputId, tableBodyId) {
+    const query = document.getElementById(searchInputId).value.trim().toLowerCase();
+    const rows = document.querySelectorAll(`#${tableBodyId} tr`);
+
+    rows.forEach(row => {
+        if (row.querySelector('.placeholder-text')) return;
+
+        let matchFound = false;
+        
+        // Loop ONLY through cell 0 (Name), cell 1 (Email), cell 2 (Phone), and cell 3 (Skills)
+        // This completely skips cell 4 (the heavy Base64 Resume Link)
+        for (let i = 0; i < 4; i++) {
+            if (row.cells[i]) {
+                const cellText = row.cells[i].textContent.toLowerCase();
+                if (cellText.includes(query)) {
+                    matchFound = true;
+                    break; // Stop checking columns if we found a match
+                }
+            }
+        }
+
+        // Apply display state toggle
+        if (matchFound) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+    });
+}
+
+// --- Event Listeners ---
+
+// Admin Inputs
+document.getElementById('adminCandidateSearch').addEventListener('input', function() {
+    runTargetedSearch('adminCandidateSearch', 'candidateTableBody');
+});
+
+// HR Inputs
+document.getElementById('hrCandidateSearch').addEventListener('input', function() {
+    runTargetedSearch('hrCandidateSearch', 'hrCandidateTableBody');
+});
+
+
+// --- Hook Suggestions Into Your Existing Data Loaders ---
+// We need to run updateSearchSuggestions() right after data tables finish drawing.
+
+// Add this line at the very bottom of your existing fetchCandidatesForHR() success block:
+// updateSearchSuggestions('hrCandidateTableBody', 'hrNameSuggestions');
+
+// Add this line at the very bottom of your existing fetchAdminMetrics() success block:
+// updateSearchSuggestions('candidateTableBody', 'adminNameSuggestions');
