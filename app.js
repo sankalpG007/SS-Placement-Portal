@@ -35,7 +35,7 @@ function toggleAuthMode() {
 function switchView(viewId, titleText) {
     document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active-view"));
     document.getElementById(viewId).classList.add("active-view");
-    document.getElementById("portalTitle").innerHTML = `<i class="fas fa-briefcase"></i> ElevateHire · ${titleText}`;
+    document.getElementById("portalTitle").innerHTML = `<i class="fas fa-briefcase"></i> SS Infotech · ${titleText}`;
     document.getElementById("logoutBtn").style.display = viewId === "loginView" ? "none" : "block";
     if (viewId === "adminView") { fetchAdminMetrics(); }
     if (viewId === "companyView") { fetchHRApplications(); }
