@@ -17,7 +17,7 @@
 
 <div id="loadingOverlay" class="loading-overlay">
     <div class="spinner"></div>
-    <p>Synchronizing live database • secure tunnel</p>
+    <p>Synchronizing database • please wait...</p>
 </div>
 
 <div class="container">
@@ -30,7 +30,7 @@
             <form id="loginForm">
                 <div class="form-group">
                     <label><i class="far fa-envelope"></i> Email / Username</label>
-                    <input type="text" id="loginUser" placeholder="admin@elevate.com / hr@company.com" required>
+                    <input type="text" id="loginUser" placeholder="admin / hr / candidate@email.com" required>
                 </div>
                 <div class="form-group">
                     <label><i class="fas fa-lock"></i> Password</label>
@@ -45,7 +45,7 @@
                 <div class="form-group"><label>Password</label><input type="password" id="regPass" required></div>
                 <div class="form-group"><label>Phone Number</label><input type="text" id="regPhone" required></div>
                 <div class="form-group"><label>Core Skills</label><input type="text" id="regSkills" placeholder="e.g. Java, Python, SQL" required></div>
-                <div class="form-group"><label>Upload Resume (PDF/Docx)</label><input type="file" id="regResume" accept=".pdf,.docx" required></div>
+                <div class="form-group"><label>Upload Resume (PDF/Docx)</label><input type="file" id="regResume" accept=".pdf,.docx"></div>
                 <button type="submit" class="submit-btn"><i class="fas fa-user-plus"></i> Create Account</button>
             </form>
             
@@ -58,46 +58,84 @@
     <!-- ADMIN VIEW -->
     <div id="adminView" class="view-panel">
         <div class="stats-grid">
-            <div class="stat-card unique-blue-card"><h3>Registered Candidates</h3><p id="totalCandidatesCount">0</p></div>
-            <div class="stat-card unique-green-card"><h3>Active Drives</h3><p id="totalDrivesCount">0</p></div>
+            <div class="stat-card unique-blue-card"><h3><i class="fas fa-users"></i> Registered Candidates</h3><p id="totalCandidatesCount">0</p></div>
+            <div class="stat-card unique-green-card"><h3><i class="fas fa-bullhorn"></i> Active Drives</h3><p id="totalDrivesCount">0</p></div>
         </div>
-       
+        
+        <h3><i class="fas fa-database"></i> Live Candidate Database</h3>
+        <div class="search-container">
+            <input type="text" id="adminCandidateSearch" placeholder="🔍 Search by name, email, or skills...">
+        </div>
+        <button class="export-btn" onclick="exportTableToExcel('candidateTableBody', 'Admin_Candidate_Database')"><i class="fas fa-file-excel"></i> Export Candidates Pool</button>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr><th>Name</th><th>Email</th><th>Phone</th><th>Skills</th><th>Resume</th></tr>
+                </thead>
+                <tbody id="candidateTableBody">
+                    <tr><td colspan="5" class="placeholder-text">Loading candidates...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <h3><i class="fas fa-paper-plane"></i> Live Applications</h3>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr><th>Date</th><th>Candidate</th><th>Company</th><th>Role</th><th>Status</th></tr>
+                </thead>
+                <tbody id="applicationsTableBody">
+                    <tr><td colspan="5" class="placeholder-text">No applications yet</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- HR VIEW -->
     <div id="companyView" class="view-panel">
-        <div class="form-wrapper"><h2 class="form-title"><i class="fas fa-plus-circle"></i> Create Placement Drive</h2>
-        <form id="driveForm">
-            <div class="form-row"><div class="form-group"><label>Company Name</label><input type="text" id="compName" required></div><div class="form-group"><label>HR Recruiter</label><input type="text" id="hrName" required></div></div>
-            <div class="form-group"><label>Job Title Role</label><input type="text" id="jobTitle" required></div>
-            <div class="form-group"><label>Eligibility Criteria</label><input type="text" id="eligibility" required></div>
-            <div class="form-group"><label>Job Description</label><textarea id="jobDesc" rows="3" placeholder="Tech stacks, responsibilities..."></textarea></div>
-            <button type="submit" class="submit-btn"><i class="fas fa-bullhorn"></i> Publish Active Drive</button>
-        </form></div>
+        <div class="form-wrapper">
+            <h2 class="form-title"><i class="fas fa-plus-circle"></i> Create Placement Drive</h2>
+            <form id="driveForm">
+                <div class="form-row">
+                    <div class="form-group"><label>Company Name</label><input type="text" id="compName" required></div>
+                    <div class="form-group"><label>HR Recruiter</label><input type="text" id="hrName" required></div>
+                </div>
+                <div class="form-group"><label>Job Title Role</label><input type="text" id="jobTitle" required></div>
+                <div class="form-group"><label>Eligibility Criteria</label><input type="text" id="eligibility" required></div>
+                <div class="form-group"><label>Job Description</label><textarea id="jobDesc" rows="3" placeholder="Tech stacks, responsibilities..."></textarea></div>
+                <button type="submit" class="submit-btn"><i class="fas fa-bullhorn"></i> Publish Active Drive</button>
+            </form>
+        </div>
+        
         <hr>
+        
         <h3><i class="fas fa-users"></i> Candidate Search Pool</h3>
-        <div class="search-container"><input type="text" id="hrCandidateSearch" list="hrNameSuggestions" placeholder="Filter by name, skills..."><datalist id="hrNameSuggestions"></datalist></div>
+        <div class="search-container">
+            <input type="text" id="hrCandidateSearch" placeholder="🔍 Filter by name, skills...">
+        </div>
         <button class="export-btn" onclick="exportTableToExcel('hrCandidateTableBody', 'HR_Candidate_Pool')"><i class="fas fa-download"></i> Download Filtered Candidates</button>
-        <div class="table-container"><table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Skills</th><th>Resume</th><th>HR Feedback</th><th>Action</th></tr></thead><tbody id="hrCandidateTableBody"><tr><td colspan="7" class="placeholder-text">Loading candidates...</td></tr></tbody></table></div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr><th>Name</th><th>Email</th><th>Phone</th><th>Skills</th><th>Resume</th><th>HR Feedback</th><th>Action</th></tr>
+                </thead>
+                <tbody id="hrCandidateTableBody">
+                    <tr><td colspan="7" class="placeholder-text">Loading candidates...</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- CANDIDATE VIEW -->
     <div id="candidateView" class="view-panel">
         <h2><i class="fas fa-rocket"></i> Available Placement Drives</h2>
         <p class="subtitle">Apply directly to active opportunities</p>
-        <div id="drivesGrid" class="drives-grid"><p class="placeholder-text">Fetching latest drives...</p></div>
+        <div id="drivesGrid" class="drives-grid">
+            <p class="placeholder-text">Fetching latest drives...</p>
+        </div>
     </div>
 </div>
 
 <script src="app.js"></script>
-<script>
-    // Mock functions for demo (replace with real backend later)
-    function logout() { document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active-view')); document.getElementById('loginView').classList.add('active-view'); document.getElementById('logoutBtn').style.display = 'none'; }
-    function toggleAuthMode() { const loginForm = document.getElementById('loginForm'); const regForm = document.getElementById('candidateRegisterForm'); const isLogin = loginForm.style.display !== 'none'; loginForm.style.display = isLogin ? 'none' : 'block'; regForm.style.display = isLogin ? 'block' : 'none'; document.getElementById('toggleText').innerText = isLogin ? 'Already have an account?' : 'New candidate?'; document.getElementById('toggleAuthBtn').innerText = isLogin ? 'Back to Login' : 'Register as Candidate'; }
-    window.exportTableToExcel = (bodyId, filename) => { alert('Excel export mock: ' + filename); };
-    document.getElementById('loginForm')?.addEventListener('submit', (e) => { e.preventDefault(); alert('Demo: Login successful (Admin view)'); document.getElementById('loginView').classList.remove('active-view'); document.getElementById('adminView').classList.add('active-view'); document.getElementById('logoutBtn').style.display = 'flex'; });
-    document.getElementById('candidateRegisterForm')?.addEventListener('submit', (e) => { e.preventDefault(); alert('Candidate registered (demo)'); toggleAuthMode(); });
-    document.getElementById('driveForm')?.addEventListener('submit', (e) => { e.preventDefault(); alert('Drive published successfully!'); });
-</script>
 </body>
 </html>
