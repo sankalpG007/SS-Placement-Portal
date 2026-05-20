@@ -123,6 +123,7 @@ document
 
       removeButtonLoading(submitBtn);
 
+      localStorage.setItem("userRole", "admin");
       switchView("adminView", "Admin Dashboard");
       return;
     }
@@ -133,7 +134,8 @@ document
       document.getElementById("loginForm").reset();
 
       removeButtonLoading(submitBtn);
-
+        
+      localStorage.setItem("userRole", "hr");
       switchView("companyView", "HR Workspace");
       return;
     }
@@ -153,14 +155,20 @@ document
       .then((res) => res.json())
       .then((res) => {
         if (res.status === "success") {
-          loggedInCandidateName = res.candidateName;
+         loggedInCandidateName = res.candidateName;
 
-          document.getElementById("loginForm").reset();
+localStorage.setItem("userRole", "candidate");
+localStorage.setItem(
+  "candidateName",
+  loggedInCandidateName
+);
 
-          switchView(
-            "candidateView",
-            `Welcome ${loggedInCandidateName}`
-          );
+document.getElementById("loginForm").reset();
+
+switchView(
+  "candidateView",
+  `Welcome ${loggedInCandidateName}`
+);
         } else {
           alert(res.message || "Invalid Credentials");
         }
@@ -300,6 +308,9 @@ function switchView(viewId, titleText) {
 
 function logout() {
   loggedInCandidateName = "";
+
+  localStorage.removeItem("userRole");
+  localStorage.removeItem("candidateName");
 
   switchView("loginView", "Placement Portal");
 }
@@ -999,3 +1010,28 @@ function exportTableToExcel(tableBodyId, filename = 'Candidate_Report') {
         document.body.removeChild(link);
     }
 }
+{
+  const savedRole = localStorage.getItem("userRole");
+
+  if (savedRole === "admin") {
+    switchView("adminView", "Admin Dashboard");
+  }
+
+  else if (savedRole === "hr") {
+    switchView("companyView", "HR Workspace");
+  }
+
+  else if (savedRole === "candidate") {
+    loggedInCandidateName =
+      localStorage.getItem("candidateName") || "";
+
+    switchView(
+      "candidateView",
+      `Welcome ${loggedInCandidateName}`
+    );
+  }
+
+  else {
+    switchView("loginView", "Placement Portal");
+  }
+};
