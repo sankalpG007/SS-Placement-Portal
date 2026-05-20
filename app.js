@@ -164,33 +164,182 @@ function logout() {
 // ================= DATA FETCHING ENGINE =================
 
 function fetchCandidatesForHR() {
+
     fetch(`${WEB_APP_URL}?target=Candidates`)
         .then(res => res.json())
         .then(res => {
+
             if (res.status === 'success') {
+
                 let tableHTML = '';
+
                 res.data.forEach(user => {
-                    // Added Resume String Decoder Logic for HR Dashboard Table
+
+                    // =========================
+                    // RESUME DISPLAY LOGIC
+                    // =========================
+
                     let resumeDisplay = "No Resume";
-                    if (user.resume_link && user.resume_link.startsWith("data:")) {
-                        resumeDisplay = `<a href="${user.resume_link}" download="${user.name}_Resume.pdf" style="color: #3b82f6; font-weight: bold; text-decoration: underline;">Download PDF</a>`;
-                    } else if (user.resume_link && user.resume_link !== "No Resume Uploaded" && user.resume_link.trim() !== "") {
-                        resumeDisplay = `<a href="${user.resume_link}" target="_blank" style="color: #3b82f6; font-weight: bold; text-decoration: underline;">View File</a>`;
+
+                    if (
+                        user.resume_link &&
+                        user.resume_link.startsWith("data:")
+                    ) {
+
+                        resumeDisplay = `
+                            <a 
+                                href="${user.resume_link}" 
+                                download="${user.name}_Resume.pdf"
+                                style="
+                                    color:#3b82f6;
+                                    font-weight:bold;
+                                    text-decoration:underline;
+                                ">
+                                Download PDF
+                            </a>
+                        `;
+
+                    } else if (
+                        user.resume_link &&
+                        user.resume_link !== "No Resume Uploaded" &&
+                        user.resume_link.trim() !== ""
+                    ) {
+
+                        resumeDisplay = `
+                            <a 
+                                href="${user.resume_link}" 
+                                target="_blank"
+                                style="
+                                    color:#3b82f6;
+                                    font-weight:bold;
+                                    text-decoration:underline;
+                                ">
+                                View File
+                            </a>
+                        `;
                     }
+
+                    // =========================
+                    // TABLE ROW UI
+                    // =========================
 
                     tableHTML += `
                         <tr>
-                            <td><strong>${user.name || '-'}</strong></td>
-                            <td>${user.email || '-'}</td>
-                            <td>${user.phone || '-'}</td>
-                            <td>${user.skills || '-'}</td> <td>${resumeDisplay}</td>
+
+                            <td>
+                                <strong>${user.name || '-'}</strong>
+                            </td>
+
+                            <td>
+                                ${user.email || '-'}
+                            </td>
+
+                            <td>
+                                ${user.phone || '-'}
+                            </td>
+
+                            <td>
+                                ${user.skills || '-'}
+                            </td>
+
+                            <td>
+                                ${resumeDisplay}
+                            </td>
+
+                            <!-- HR FEEDBACK DROPDOWN -->
+
+                            <td>
+
+                                <select 
+                                    id="feedback_${user.email}" 
+                                    class="feedback-select"
+                                >
+
+                                    <option 
+                                        value="In Process"
+                                        ${user.feedback === 'In Process' ? 'selected' : ''}
+                                    >
+                                        In Process
+                                    </option>
+
+                                    <option 
+                                        value="Selected"
+                                        ${user.feedback === 'Selected' ? 'selected' : ''}
+                                    >
+                                        Selected
+                                    </option>
+
+                                    <option 
+                                        value="Rejected"
+                                        ${user.feedback === 'Rejected' ? 'selected' : ''}
+                                    >
+                                        Rejected
+                                    </option>
+
+                                    <option 
+                                        value="On Hold"
+                                        ${user.feedback === 'On Hold' ? 'selected' : ''}
+                                    >
+                                        On Hold
+                                    </option>
+
+                                </select>
+
+                            </td>
+
+                            <!-- SAVE BUTTON -->
+
+                            <td>
+
+                                <button
+                                    class="feedback-btn"
+                                    onclick="updateCandidateFeedback('${user.email}', '${user.name}')"
+                                >
+                                    Save
+                                </button>
+
+                            </td>
+
                         </tr>
                     `;
                 });
-                document.getElementById('hrCandidateTableBody').innerHTML = tableHTML || `<tr><td colspan='4' class='text-center'>No candidates signed up yet.</td></tr>`;
+
+                // =========================
+                // EMPTY STATE
+                // =========================
+
+                document.getElementById('hrCandidateTableBody').innerHTML =
+                    tableHTML ||
+                    `
+                    <tr>
+                        <td colspan='7' class='text-center'>
+                            No candidates signed up yet.
+                        </td>
+                    </tr>
+                    `;
+
+                // =========================
+                // SEARCH SUGGESTIONS
+                // =========================
+
+                updateSearchSuggestions(
+                    'hrCandidateTableBody',
+                    'hrNameSuggestions'
+                );
             }
+        })
+        .catch(err => {
+
+            console.error(err);
+
+            document.getElementById('hrCandidateTableBody').innerHTML = `
+                <tr>
+                    <td colspan='7' class='text-center'>
+                        Error loading candidate records.
+                    </td>
+                </tr>
+            `;
         });
-        updateSearchSuggestions('hrCandidateTableBody', 'hrNameSuggestions');
 }
 
 function fetchAdminMetrics() {
@@ -292,6 +441,32 @@ function applyToDrive(companyName, jobTitle) {
     })
     .then(() => alert(`Success! Application submitted for ${jobTitle} role at ${companyName}.`))
     .catch(err => alert("Pipeline connection error."));
+}
+
+// ================= HR FEEDBACK UPDATE ENGINE =================
+
+function updateCandidateFeedback(candidateEmail, candidateName) {
+
+    const feedbackValue = document.getElementById(`feedback_${candidateEmail}`).value;
+
+    const payload = {
+        action: "updateFeedback",
+        email: candidateEmail,
+        name: candidateName,
+        feedback: feedbackValue
+    };
+
+    fetch(WEB_APP_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+    })
+    .then(() => {
+        alert(`Feedback updated successfully for ${candidateName}`);
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Unable to update feedback.");
+    });
 }
 
 // ================= UPGRADED SEARCH ENGINE WITH AUTO-SUGGESTIONS =================
