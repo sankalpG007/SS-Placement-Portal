@@ -183,7 +183,7 @@ function fetchCandidatesForHR() {
                             <td><strong>${user.name || '-'}</strong></td>
                             <td>${user.email || '-'}</td>
                             <td>${user.phone || '-'}</td>
-                            <td>${resumeDisplay}</td>
+                            <td>${user.skills || '-'}</td> <td>${resumeDisplay}</td>
                         </tr>
                     `;
                 });
@@ -211,7 +211,7 @@ function fetchAdminMetrics() {
                         <td><strong>${user.name || '-'}</strong></td>
                         <td>${user.email || '-'}</td>
                         <td>${user.phone || '-'}</td>
-                        <td>${resumeDisplay}</td>
+                        <td>${user.skills || '-'}</td> <td>${resumeDisplay}</td>
                     </tr>
                 `;
             });
