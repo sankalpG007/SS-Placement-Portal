@@ -13,7 +13,6 @@ body {
     min-height: 100vh;
 }
 
-/* Header Premium */
 header {
     background: linear-gradient(135deg, #0b2b44 0%, #123e6a 100%);
     padding: 18px 32px;
@@ -65,7 +64,6 @@ header {
     transform: scale(0.97);
 }
 
-/* Container */
 .container {
     max-width: 1400px;
     margin: 28px auto;
@@ -73,7 +71,6 @@ header {
     width: 100%;
 }
 
-/* View Panels */
 .view-panel {
     display: none;
     background: white;
@@ -99,7 +96,6 @@ header {
     }
 }
 
-/* Login Card */
 .login-card {
     max-width: 480px;
     margin: 40px auto;
@@ -125,7 +121,6 @@ header {
     font-size: 0.9rem;
 }
 
-/* Form Groups */
 .form-group {
     text-align: left;
     margin-bottom: 18px;
@@ -156,7 +151,6 @@ header {
     box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
 }
 
-/* Buttons */
 .login-submit-btn, .submit-btn {
     background: #0f3b6f;
     color: white;
@@ -203,7 +197,6 @@ hr {
     border-top: 1.5px solid #eef2ff;
 }
 
-/* Stats Cards */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -241,7 +234,6 @@ hr {
     margin-top: 8px;
 }
 
-/* Tables */
 .table-container {
     width: 100%;
     overflow-x: auto;
@@ -249,6 +241,7 @@ hr {
     border: 1px solid #edf2f7;
     background: white;
     margin-top: 20px;
+    margin-bottom: 30px;
 }
 
 table {
@@ -277,7 +270,6 @@ td {
     padding: 32px;
 }
 
-/* Search */
 .search-container {
     width: 100%;
     margin: 20px 0 20px 0;
@@ -311,7 +303,6 @@ td {
     color: #94a3b8;
 }
 
-/* Export Button */
 .export-btn {
     background: #10b981;
     border: none;
@@ -332,7 +323,6 @@ td {
     transform: scale(0.98);
 }
 
-/* Drive Cards */
 .drives-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
@@ -382,7 +372,6 @@ td {
     background: #1d4ed8;
 }
 
-/* Loading Overlay */
 .loading-overlay {
     position: fixed;
     top: 0;
@@ -437,6 +426,36 @@ td {
 
 .form-row .form-group {
     flex: 1;
+}
+
+.feedback-select {
+    padding: 8px 12px;
+    border-radius: 28px;
+    border: 1.5px solid #cbd5e1;
+    font-weight: 500;
+}
+
+.feedback-btn {
+    background: #3b82f6;
+    border: none;
+    color: white;
+    padding: 6px 14px;
+    border-radius: 40px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.feedback-btn:hover {
+    background: #2563eb;
+}
+
+.status-badge {
+    background: #eef2ff;
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #1e40af;
 }
 
 @media (max-width: 700px) {

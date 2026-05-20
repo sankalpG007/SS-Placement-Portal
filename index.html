@@ -62,30 +62,36 @@
             <div class="stat-card unique-green-card"><h3><i class="fas fa-bullhorn"></i> Active Drives</h3><p id="totalDrivesCount">0</p></div>
         </div>
         
-        <h3><i class="fas fa-database"></i> Live Candidate Database</h3>
+        <!-- ADMIN: REGISTERED CANDIDATES SHEET -->
+        <h3><i class="fas fa-database"></i> 📋 Registered Candidates Sheet</h3>
         <div class="search-container">
             <input type="text" id="adminCandidateSearch" placeholder="🔍 Search by name, email, or skills...">
         </div>
-        <button class="export-btn" onclick="exportTableToExcel('candidateTableBody', 'Admin_Candidate_Database')"><i class="fas fa-file-excel"></i> Export Candidates Pool</button>
+        <button class="export-btn" onclick="exportTableToExcel('candidateTableBody', 'Registered_Candidates')"><i class="fas fa-file-excel"></i> Export Registered Candidates</button>
         <div class="table-container">
             <table>
                 <thead>
                     <tr><th>Name</th><th>Email</th><th>Phone</th><th>Skills</th><th>Resume</th></tr>
                 </thead>
                 <tbody id="candidateTableBody">
-                    <tr><td colspan="5" class="placeholder-text">Loading candidates...</td></tr>
+                    <tr><td colspan="5" class="placeholder-text">Loading registered candidates...</td></tr>
                 </tbody>
             </table>
         </div>
         
-        <h3><i class="fas fa-paper-plane"></i> Live Applications</h3>
+        <!-- ADMIN: APPLICATIONS SHEET -->
+        <h3><i class="fas fa-paper-plane"></i> 📄 All Applications Sheet (with HR Feedback)</h3>
+        <div class="search-container">
+            <input type="text" id="adminAppSearch" placeholder="🔍 Search by candidate, company, role...">
+        </div>
+        <button class="export-btn" onclick="exportTableToExcel('adminApplicationsTableBody', 'All_Applications_Feedback')"><i class="fas fa-file-excel"></i> Export Applications Sheet</button>
         <div class="table-container">
             <table>
                 <thead>
-                    <tr><th>Date</th><th>Candidate</th><th>Company</th><th>Role</th><th>Status</th></tr>
+                    <tr><th>Date</th><th>Candidate</th><th>Company</th><th>Role</th><th>HR Feedback Status</th></tr>
                 </thead>
-                <tbody id="applicationsTableBody">
-                    <tr><td colspan="5" class="placeholder-text">No applications yet</td></tr>
+                <tbody id="adminApplicationsTableBody">
+                    <tr><td colspan="5" class="placeholder-text">Loading applications...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -109,18 +115,20 @@
         
         <hr>
         
-        <h3><i class="fas fa-users"></i> Candidate Search Pool</h3>
+        <!-- HR: APPLICATIONS SHEET WITH FEEDBACK FUNCTIONALITY -->
+        <h3><i class="fas fa-users"></i> 🎯 Drive Applications & Feedback Panel</h3>
+        <p class="subtitle">Candidates who applied for drives — update their selection status</p>
         <div class="search-container">
-            <input type="text" id="hrCandidateSearch" placeholder="🔍 Filter by name, skills...">
+            <input type="text" id="hrAppSearch" placeholder="🔍 Filter by candidate name, company, role...">
         </div>
-        <button class="export-btn" onclick="exportTableToExcel('hrCandidateTableBody', 'HR_Candidate_Pool')"><i class="fas fa-download"></i> Download Filtered Candidates</button>
+        <button class="export-btn" onclick="exportTableToExcel('hrApplicationsTableBody', 'HR_Applications_Feedback')"><i class="fas fa-download"></i> Export Applications with Feedback</button>
         <div class="table-container">
             <table>
                 <thead>
-                    <tr><th>Name</th><th>Email</th><th>Phone</th><th>Skills</th><th>Resume</th><th>HR Feedback</th><th>Action</th></tr>
+                    <tr><th>Date</th><th>Candidate Name</th><th>Company</th><th>Job Role</th><th>Feedback Status</th><th>Update Action</th></tr>
                 </thead>
-                <tbody id="hrCandidateTableBody">
-                    <tr><td colspan="7" class="placeholder-text">Loading candidates...</td></tr>
+                <tbody id="hrApplicationsTableBody">
+                    <tr><td colspan="6" class="placeholder-text">Loading applications...</td></tr>
                 </tbody>
             </table>
         </div>

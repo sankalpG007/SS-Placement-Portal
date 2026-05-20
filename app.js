@@ -1,1086 +1,232 @@
 // ============================
-// GLOBAL APPLICATION CONFIG
+// GLOBAL CONFIGURATION
 // ============================
-
-const WEB_APP_URL =
-  "https://script.google.com/macros/s/AKfycbzZB_CpPCXKf3A1CUOv79EgY-d8nozfRJi9yh_cmBwSI1KkzQySOs9fFCt_mG7WlLe4/exec";
-
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzZB_CpPCXKf3A1CUOv79EgY-d8nozfRJi9yh_cmBwSI1KkzQySOs9fFCt_mG7WlLe4/exec";
 let loggedInCandidateName = "";
 
-// ============================
-// GLOBAL LOADERS & BUTTONS
-// ============================
-
-function showLoader(message = "Loading Data...") {
-  const overlay = document.getElementById("loadingOverlay");
-
-  if (overlay) {
-    overlay.querySelector("p").innerText = message;
-    overlay.classList.add("show");
-  }
+function showLoader(msg) {
+    const overlay = document.getElementById("loadingOverlay");
+    if (overlay) { overlay.querySelector("p").innerText = msg; overlay.classList.add("show"); }
 }
-
-function hideLoader() {
-  const overlay = document.getElementById("loadingOverlay");
-
-  if (overlay) {
-    overlay.classList.remove("show");
-  }
-}
-
-function setButtonLoading(buttonElement) {
-  if (!buttonElement) return;
-
-  buttonElement.setAttribute(
-    "data-original-text",
-    buttonElement.innerHTML
-  );
-
-  buttonElement.classList.add("btn-loading");
-  buttonElement.disabled = true;
-}
-
-function removeButtonLoading(buttonElement) {
-  if (!buttonElement) return;
-
-  buttonElement.classList.remove("btn-loading");
-  buttonElement.disabled = false;
-
-  if (buttonElement.hasAttribute("data-original-text")) {
-    buttonElement.innerHTML =
-      buttonElement.getAttribute("data-original-text");
-  }
-}
-
-// ============================
-// AUTH SCREEN TOGGLE
-// ============================
+function hideLoader() { document.getElementById("loadingOverlay")?.classList.remove("show"); }
+function setButtonLoading(btn) { if(btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...'; } }
+function removeButtonLoading(btn, originalText) { if(btn) { btn.disabled = false; btn.innerHTML = originalText; } }
 
 let isRegisterMode = false;
-
 function toggleAuthMode() {
-  isRegisterMode = !isRegisterMode;
-
-  const loginForm = document.getElementById("loginForm");
-  const registerForm = document.getElementById(
-    "candidateRegisterForm"
-  );
-
-  const authTitle = document.getElementById("authTitle");
-  const authSubtitle = document.getElementById("authSubtitle");
-
-  const toggleBtn = document.getElementById("toggleAuthBtn");
-  const toggleText = document.getElementById("toggleText");
-
-  if (isRegisterMode) {
-    loginForm.style.display = "none";
-    registerForm.style.display = "block";
-
-    authTitle.innerText = "Candidate Registration";
-    authSubtitle.innerText =
-      "Create account to browse and apply jobs";
-
-    toggleBtn.innerText = "Back to Login";
-    toggleText.innerText = "Already have an account?";
-  } else {
-    loginForm.style.display = "block";
-    registerForm.style.display = "none";
-
-    authTitle.innerText = "Portal Authentication";
-    authSubtitle.innerText =
-      "Sign in to access your workspace";
-
-    toggleBtn.innerText = "Register as Candidate";
-    toggleText.innerText = "New candidate looking for jobs?";
-  }
-}
-
-// ============================
-// LOGIN SYSTEM
-// ============================
-
-document
-  .getElementById("loginForm")
-  .addEventListener("submit", function (e) {
-    e.preventDefault();
-
-    const submitBtn =
-      e.target.querySelector('button[type="submit"]');
-
-    const userField = document
-      .getElementById("loginUser")
-      .value.trim();
-
-    const passField =
-      document.getElementById("loginPass").value;
-
-    setButtonLoading(submitBtn);
-
-    // ================= ADMIN LOGIN =================
-
-    if (userField === "admin" && passField === "admin123") {
-      document.getElementById("loginForm").reset();
-
-      removeButtonLoading(submitBtn);
-
-      localStorage.setItem("userRole", "admin");
-      switchView("adminView", "Admin Dashboard");
-      return;
-    }
-
-    // ================= HR LOGIN =================
-
-    if (userField === "hr" && passField === "hr123") {
-      document.getElementById("loginForm").reset();
-
-      removeButtonLoading(submitBtn);
-        
-      localStorage.setItem("userRole", "hr");
-      switchView("companyView", "HR Workspace");
-      return;
-    }
-
-    // ================= CANDIDATE LOGIN =================
-
-    const payload = {
-      action: "loginCandidate",
-      email: userField,
-      password: passField,
-    };
-
-    fetch(WEB_APP_URL, {
-      method: "POST",
-      body: JSON.stringify(payload),
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        if (res.status === "success") {
-         loggedInCandidateName = res.candidateName;
-
-localStorage.setItem("userRole", "candidate");
-localStorage.setItem(
-  "candidateName",
-  loggedInCandidateName
-);
-
-document.getElementById("loginForm").reset();
-
-switchView(
-  "candidateView",
-  `Welcome ${loggedInCandidateName}`
-);
-        } else {
-          alert(res.message || "Invalid Credentials");
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        alert("Authentication Error");
-      })
-      .finally(() => {
-        removeButtonLoading(submitBtn);
-      });
-  });
-
-// ============================
-// CANDIDATE REGISTRATION
-// ============================
-
-document
-  .getElementById("candidateRegisterForm")
-  .addEventListener("submit", function (e) {
-    e.preventDefault();
-
-    const submitBtn =
-      e.target.querySelector('button[type="submit"]');
-
-    const fileInput =
-      document.getElementById("regResume").files[0];
-
-    const payload = {
-      action: "registerCandidate",
-      name: document.getElementById("regName").value.trim(),
-      email: document.getElementById("regEmail").value.trim(),
-      password: document.getElementById("regPass").value,
-      phone: document.getElementById("regPhone").value.trim(),
-      skills: document
-        .getElementById("regSkills")
-        .value.trim(),
-      resumeFile: null,
-      resumeName: null,
-      resumeType: null,
-    };
-
-    function sendData(finalPayload) {
-      setButtonLoading(submitBtn);
-
-      showLoader(
-        "Uploading profile & converting resume..."
-      );
-
-      fetch(WEB_APP_URL, {
-        method: "POST",
-        body: JSON.stringify(finalPayload),
-      })
-        .then((res) => res.json())
-        .then((res) => {
-          if (res.status === "success") {
-            alert("Registration Successful");
-            document
-              .getElementById("candidateRegisterForm")
-              .reset();
-            toggleAuthMode();
-          } else {
-            alert(res.message || "Registration Failed");
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-          alert("Registration Error");
-        })
-        .finally(() => {
-          hideLoader();
-          removeButtonLoading(submitBtn);
-        });
-    }
-
-    // ================= FILE PROCESSING =================
-
-    if (fileInput) {
-      const reader = new FileReader();
-
-      reader.onload = function (event) {
-        const base64String =
-          event.target.result.split(",")[1];
-
-        payload.resumeFile = base64String;
-        payload.resumeName = fileInput.name;
-        payload.resumeType = fileInput.type;
-
-        sendData(payload);
-      };
-
-      reader.readAsDataURL(fileInput);
+    isRegisterMode = !isRegisterMode;
+    const loginForm = document.getElementById("loginForm");
+    const regForm = document.getElementById("candidateRegisterForm");
+    const toggleBtn = document.getElementById("toggleAuthBtn");
+    const toggleText = document.getElementById("toggleText");
+    if (isRegisterMode) {
+        loginForm.style.display = "none";
+        regForm.style.display = "block";
+        toggleBtn.innerHTML = "<i class='fas fa-sign-in-alt'></i> Back to Login";
+        toggleText.innerText = "Already have an account?";
     } else {
-      sendData(payload);
+        loginForm.style.display = "block";
+        regForm.style.display = "none";
+        toggleBtn.innerHTML = "<i class='fas fa-user-plus'></i> Register as Candidate";
+        toggleText.innerText = "New candidate looking for jobs?";
     }
-  });
-
-// ============================
-// VIEW ROUTER
-// ============================
+}
 
 function switchView(viewId, titleText) {
-  document
-    .querySelectorAll(".view-panel")
-    .forEach((panel) =>
-      panel.classList.remove("active-view")
-    );
-
-  document
-    .getElementById(viewId)
-    .classList.add("active-view");
-
-  document.getElementById("portalTitle").innerText =
-    titleText;
-
-  if (viewId === "loginView") {
-    document.getElementById("logoutBtn").style.display =
-      "none";
-  } else {
-    document.getElementById("logoutBtn").style.display =
-      "block";
-  }
-
-  if (viewId === "adminView") {
-    fetchAdminMetrics();
-  }
-
-  if (viewId === "companyView") {
-    fetchCandidatesForHR();
-  }
-
-  if (viewId === "candidateView") {
-    fetchActiveDrives();
-    fetchMyApplications();
-  }
+    document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active-view"));
+    document.getElementById(viewId).classList.add("active-view");
+    document.getElementById("portalTitle").innerHTML = `<i class="fas fa-briefcase"></i> ElevateHire · ${titleText}`;
+    document.getElementById("logoutBtn").style.display = viewId === "loginView" ? "none" : "block";
+    if (viewId === "adminView") { fetchAdminMetrics(); }
+    if (viewId === "companyView") { fetchHRApplications(); }
+    if (viewId === "candidateView") { fetchActiveDrives(); }
 }
-
-function logout() {
-  loggedInCandidateName = "";
-
-  localStorage.removeItem("userRole");
-  localStorage.removeItem("candidateName");
-
-  switchView("loginView", "Placement Portal");
-}
+function logout() { loggedInCandidateName = ""; localStorage.clear(); switchView("loginView", "Placement Portal"); }
 
 // ============================
-// FETCH HR CANDIDATES (FIXED)
+// AUTH & REGISTRATION
 // ============================
-
-function fetchCandidatesForHR() {
-  showLoader("Loading Candidates...");
-
-  // Use POST method with action to get candidates
-  const payload = {
-    action: "getCandidates"
-  };
-
-  fetch(WEB_APP_URL, {
-    method: "POST",
-    body: JSON.stringify(payload)
-  })
-    .then((res) => res.json())
-    .then((res) => {
-      if (res.status !== "success") {
-        console.error("Failed to load candidates:", res.message);
-        return;
-      }
-
-      let tableHTML = "";
-
-      res.data.forEach((user) => {
-        let resumeDisplay = "No Resume";
-
-        // Check if resume_link contains a HYPERLINK formula or data URL
-        if (user.resume_link && user.resume_link.includes("HYPERLINK")) {
-          // Extract URL from HYPERLINK formula
-          const urlMatch = user.resume_link.match(/HYPERLINK\("([^"]+)"/);
-          if (urlMatch && urlMatch[1]) {
-            resumeDisplay = `
-              <a 
-                href="${urlMatch[1]}" 
-                download="${user.name}_Resume.pdf"
-                class="resume-link"
-                target="_blank"
-              >
-                Download Resume
-              </a>
-            `;
-          }
-        } else if (user.resume_link && user.resume_link.startsWith("data:")) {
-          resumeDisplay = `
-            <a 
-              href="${user.resume_link}" 
-              download="${user.name}_Resume.pdf"
-              class="resume-link"
-            >
-              Download Resume
-            </a>
-          `;
-        }
-
-        tableHTML += `
-          <tr>
-            <td><strong>${user.name || "-"}</strong></td>
-            <td>${user.email || "-"}</td>
-            <td>${user.phone || "-"}</td>
-            <td>${user.skills || "-"}</td>
-            <td>${resumeDisplay}</td>
-            <td>
-              <select 
-                id="feedback_${user.email}"
-                class="feedback-select"
-              >
-                <option value="In Process"
-                  ${user.feedback === "In Process" ? "selected" : ""}
-                >
-                  In Process
-                </option>
-                <option value="Selected"
-                  ${user.feedback === "Selected" ? "selected" : ""}
-                >
-                  Selected
-                </option>
-                <option value="Rejected"
-                  ${user.feedback === "Rejected" ? "selected" : ""}
-                >
-                  Rejected
-                </option>
-                <option value="On Hold"
-                  ${user.feedback === "On Hold" ? "selected" : ""}
-                >
-                  On Hold
-                </option>
-              </select>
-            </td>
-            <td>
-              <button
-                class="feedback-btn"
-                onclick="updateCandidateFeedback('${user.email}','${user.name}')"
-              >
-                Save
-              </button>
-            </td>
-          </tr>
-        `;
-      });
-
-      document.getElementById(
-        "hrCandidateTableBody"
-      ).innerHTML =
-        tableHTML ||
-        `
-          <tr>
-            <td colspan="7" class="text-center">
-              No candidates available
-            </td>
-          </tr>
-        `;
-
-      updateSearchSuggestions(
-        "hrCandidateTableBody",
-        "hrNameSuggestions"
-      );
-    })
-    .catch((err) => {
-      console.error(err);
-      alert("Unable to load candidates");
-    })
-    .finally(() => {
-      hideLoader();
-    });
-}
-
-// ============================
-// LOAD HR CANDIDATES (Wrapper function for refresh button)
-// ============================
-
-function loadHRCandidates() {
-  fetchCandidatesForHR();
-}
-
-// ============================
-// ADMIN DASHBOARD
-// ============================
-
-function fetchAdminMetrics() {
-  showLoader("Loading Dashboard Metrics...");
-
-  Promise.all([
-    fetch(WEB_APP_URL, {
-      method: "POST",
-      body: JSON.stringify({ action: "getCandidates" })
-    }).then((r) => r.json()),
-    
-    fetch(WEB_APP_URL, {
-      method: "POST", 
-      body: JSON.stringify({ action: "getDrives" })
-    }).then((r) => r.json()),
-    
-    fetch(WEB_APP_URL, {
-      method: "POST",
-      body: JSON.stringify({ action: "getApplications" })
-    }).then((r) => r.json())
-  ])
-    .then(([candidateRes, driveRes, appRes]) => {
-      // ================= CANDIDATES =================
-
-      if (candidateRes.status === "success") {
-        document.getElementById(
-          "totalCandidatesCount"
-        ).innerText = candidateRes.data.length;
-
-        let tableHTML = "";
-
-        candidateRes.data.forEach((user) => {
-          let resumeDisplay = "No Resume";
-
-          if (user.resume_link && user.resume_link.includes("HYPERLINK")) {
-            const urlMatch = user.resume_link.match(/HYPERLINK\("([^"]+)"/);
-            if (urlMatch && urlMatch[1]) {
-              resumeDisplay = `
-                <a 
-                  href="${urlMatch[1]}"
-                  download="${user.name}_Resume.pdf"
-                  class="resume-link"
-                  target="_blank"
-                >
-                  Download Resume
-                </a>
-              `;
-            }
-          } else if (user.resume_link && user.resume_link.startsWith("data:")) {
-            resumeDisplay = `
-              <a 
-                href="${user.resume_link}"
-                download="${user.name}_Resume.pdf"
-                class="resume-link"
-              >
-                Download Resume
-              </a>
-            `;
-          }
-
-          tableHTML += `
-            <tr>
-              <td><strong>${user.name}</strong></td>
-              <td>${user.email}</td>
-              <td>${user.phone}</td>
-              <td>${user.skills}</td>
-              <td>${resumeDisplay}</td>
-            </tr>
-          `;
-        });
-
-        document.getElementById(
-          "candidateTableBody"
-        ).innerHTML = tableHTML;
-
-        updateSearchSuggestions(
-          "candidateTableBody",
-          "adminNameSuggestions"
-        );
-      }
-
-      // ================= DRIVES =================
-
-      if (driveRes.status === "success") {
-        document.getElementById(
-          "totalDrivesCount"
-        ).innerText = driveRes.data.length;
-      }
-
-      // ================= APPLICATIONS =================
-
-      if (appRes.status === "success") {
-        let appHTML = "";
-
-        appRes.data.forEach((item) => {
-          const dateObj = new Date(item.timestamp);
-
-          appHTML += `
-            <tr>
-              <td>${dateObj.toLocaleDateString()}</td>
-              <td>
-                <strong>
-                  ${item.candidate_name || "-"}
-                </strong>
-              </td>
-              <td>${item.company_name || "-"}</td>
-              <td>${item.job_title || "-"}</td>
-              <td>
-                <span class="status-badge">
-                  ${item.application_status || "Applied"}
-                </span>
-              </td>
-            </tr>
-          `;
-        });
-
-        document.getElementById(
-          "applicationsTableBody"
-        ).innerHTML =
-          appHTML ||
-          `
-            <tr>
-              <td colspan="5">
-                No Applications
-              </td>
-            </tr>
-          `;
-      }
-    })
-    .catch((err) => {
-      console.error(err);
-      alert("Dashboard Error");
-    })
-    .finally(() => {
-      hideLoader();
-    });
-}
-
-// ============================
-// POST NEW DRIVE
-// ============================
-
-document
-  .getElementById("driveForm")
-  .addEventListener("submit", function (e) {
+document.getElementById("loginForm").addEventListener("submit", function(e) {
     e.preventDefault();
+    const user = document.getElementById("loginUser").value.trim();
+    const pass = document.getElementById("loginPass").value;
+    const btn = e.target.querySelector('button');
+    if (user === "admin" && pass === "admin123") { localStorage.setItem("userRole","admin"); switchView("adminView","Admin Dashboard"); removeButtonLoading(btn,"Verify"); return; }
+    if (user === "hr" && pass === "hr123") { localStorage.setItem("userRole","hr"); switchView("companyView","HR Workspace"); removeButtonLoading(btn,"Verify"); return; }
+    setButtonLoading(btn);
+    fetch(WEB_APP_URL, { method:"POST", body:JSON.stringify({ action:"loginCandidate", email:user, password:pass }) })
+        .then(res=>res.json()).then(res=>{
+            if(res.status==="success") {
+                loggedInCandidateName = res.candidateName;
+                localStorage.setItem("userRole","candidate");
+                localStorage.setItem("candidateName",loggedInCandidateName);
+                switchView("candidateView",`Welcome ${loggedInCandidateName}`);
+            } else alert(res.message || "Invalid Credentials");
+        }).catch(err=>alert("Auth Error")).finally(()=>removeButtonLoading(btn,"Verify"));
+});
 
-    const submitBtn =
-      e.target.querySelector('button[type="submit"]');
-
-    setButtonLoading(submitBtn);
-
-    const drivePayload = {
-      action: "postDrive",
-      companyName:
-        document.getElementById("compName").value,
-      hrName: document.getElementById("hrName").value,
-      jobTitle:
-        document.getElementById("jobTitle").value,
-      eligibility:
-        document.getElementById("eligibility").value,
-      description:
-        document.getElementById("jobDesc").value,
+document.getElementById("candidateRegisterForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const fileInput = document.getElementById("regResume").files[0];
+    const payload = { action:"registerCandidate", name:document.getElementById("regName").value.trim(), email:document.getElementById("regEmail").value.trim(), password:document.getElementById("regPass").value, phone:document.getElementById("regPhone").value.trim(), skills:document.getElementById("regSkills").value.trim() };
+    const sendData = (finalPayload) => {
+        const btn = e.target.querySelector('button');
+        setButtonLoading(btn);
+        showLoader("Registering...");
+        fetch(WEB_APP_URL, { method:"POST", body:JSON.stringify(finalPayload) }).then(res=>res.json()).then(res=>{ alert(res.status==="success"?"Registration Successful":res.message); if(res.status==="success"){ e.target.reset(); toggleAuthMode(); } }).catch(err=>alert("Error")).finally(()=>{ hideLoader(); removeButtonLoading(btn,"Create Account"); });
     };
+    if(fileInput) {
+        const reader = new FileReader();
+        reader.onload = ev => { const base64 = ev.target.result.split(",")[1]; payload.resumeFile = base64; payload.resumeName = fileInput.name; payload.resumeType = fileInput.type; sendData(payload); };
+        reader.readAsDataURL(fileInput);
+    } else sendData(payload);
+});
 
-    fetch(WEB_APP_URL, {
-      method: "POST",
-      body: JSON.stringify(drivePayload),
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        if (res.status === "success") {
-          alert("Placement Drive Published");
-          document.getElementById("driveForm").reset();
-          fetchActiveDrives();
-        } else {
-          alert(res.message || "Drive Publish Failed");
+// ============================
+// ADMIN: Registered Candidates + Applications Sheet
+// ============================
+function fetchAdminMetrics() {
+    showLoader("Loading Admin Data...");
+    Promise.all([
+        fetch(WEB_APP_URL, { method:"POST", body:JSON.stringify({ action:"getCandidates" }) }).then(r=>r.json()),
+        fetch(WEB_APP_URL, { method:"POST", body:JSON.stringify({ action:"getDrives" }) }).then(r=>r.json()),
+        fetch(WEB_APP_URL, { method:"POST", body:JSON.stringify({ action:"getApplications" }) }).then(r=>r.json())
+    ]).then(([candRes, driveRes, appRes]) => {
+        if(candRes.status==="success") {
+            document.getElementById("totalCandidatesCount").innerText = candRes.data.length;
+            let html = "";
+            candRes.data.forEach(u => {
+                let resumeLink = "No Resume";
+                if(u.resume_link && u.resume_link.includes("HYPERLINK")) {
+                    let match = u.resume_link.match(/HYPERLINK\("([^"]+)"/);
+                    if(match) resumeLink = `<a href="${match[1]}" target="_blank" class="resume-link">📄 Download</a>`;
+                } else if(u.resume_link && u.resume_link.startsWith("data:")) resumeLink = `<a href="${u.resume_link}" download="${u.name}_Resume.pdf">📄 Download</a>`;
+                html += `<tr><td><strong>${u.name}</strong></td><td>${u.email}</td><td>${u.phone}</td><td>${u.skills}</td><td>${resumeLink}</td></tr>`;
+            });
+            document.getElementById("candidateTableBody").innerHTML = html || "<tr><td colspan='5'>No candidates</td></tr>";
         }
-      })
-      .catch((err) => {
-        console.error(err);
-        alert("Drive Publish Failed");
-      })
-      .finally(() => {
-        removeButtonLoading(submitBtn);
-      });
-  });
-
-// ============================
-// FETCH ACTIVE DRIVES
-// ============================
-
-function fetchActiveDrives() {
-  showLoader("Loading Active Drives...");
-
-  const payload = {
-    action: "getDrives"
-  };
-
-  fetch(WEB_APP_URL, {
-    method: "POST",
-    body: JSON.stringify(payload)
-  })
-    .then((res) => res.json())
-    .then((res) => {
-      if (res.status !== "success") return;
-
-      let gridHTML = "";
-
-      res.data.forEach((drive) => {
-        gridHTML += `
-          <div class="drive-card">
-            <h4>
-              ${drive.job_title || "Open Position"}
-            </h4>
-            <span class="company-badge">
-              ${drive.company_name || "Anonymous Recruiter"}
-            </span>
-            <p>
-              <strong>Eligibility:</strong>
-              ${drive.eligibility || "Open"}
-            </p>
-            <p>
-              <strong>Description:</strong>
-              ${drive.job_description || "No description"}
-            </p>
-            <button
-              class="apply-btn"
-              onclick="applyToDrive(this,'${drive.company_name}','${drive.job_title}')"
-            >
-              Quick Apply
-            </button>
-          </div>
-        `;
-      });
-
-      document.getElementById("drivesGrid").innerHTML =
-        gridHTML ||
-        `
-          <p class="placeholder-text">
-            No Active Drives
-          </p>
-        `;
-    })
-    .catch((err) => {
-      console.error(err);
-      alert("Unable to fetch drives");
-    })
-    .finally(() => {
-      hideLoader();
-    });
-}
-
-// ============================
-// APPLY TO DRIVE
-// ============================
-
-function applyToDrive(
-  buttonElement,
-  companyName,
-  jobTitle
-) {
-  setButtonLoading(buttonElement);
-
-  const payload = {
-    action: "submitApplication",
-    candidateName: loggedInCandidateName,
-    companyName,
-    jobTitle,
-  };
-
-  fetch(WEB_APP_URL, {
-    method: "POST",
-    body: JSON.stringify(payload),
-  })
-    .then((res) => res.json())
-    .then((res) => {
-      if (res.status === "success") {
-        alert(`Application Submitted for ${jobTitle}`);
-        fetchMyApplications();
-      } else {
-        alert(res.message || "Application Failed");
-      }
-    })
-    .catch((err) => {
-      console.error(err);
-      alert("Application Failed");
-    })
-    .finally(() => {
-      removeButtonLoading(buttonElement);
-    });
-}
-
-// ============================
-// FETCH MY APPLICATIONS
-// ============================
-
-function fetchMyApplications() {
-  const payload = {
-    action: "getApplications"
-  };
-
-  fetch(WEB_APP_URL, {
-    method: "POST",
-    body: JSON.stringify(payload)
-  })
-    .then((res) => res.json())
-    .then((res) => {
-      if (res.status !== "success") return;
-
-      let html = "";
-
-      const myApps = res.data.filter(
-        (app) =>
-          app.candidate_name ===
-          loggedInCandidateName
-      );
-
-      myApps.forEach((app) => {
-        html += `
-          <tr>
-            <td>${app.company_name}</td>
-            <td>${app.job_title}</td>
-            <td>
-              <span class="status-badge">
-                ${app.application_status || "Applied"}
-              </span>
-            </td>
-          </tr>
-        `;
-      });
-
-      const table =
-        document.getElementById(
-          "candidateApplicationsBody"
-        );
-
-      if (table) {
-        table.innerHTML =
-          html ||
-          `
-            <tr>
-              <td colspan="3">
-                No Applications Yet
-              </td>
-            </tr>
-          `;
-      }
-    })
-    .catch((err) => {
-      console.error(err);
-    });
-}
-
-// ============================
-// UPDATE FEEDBACK
-// ============================
-
-function updateCandidateFeedback(
-  candidateEmail,
-  candidateName
-) {
-  const feedbackValue = document.getElementById(
-    `feedback_${candidateEmail}`
-  ).value;
-
-  const payload = {
-    action: "updateFeedback",
-    email: candidateEmail,
-    name: candidateName,
-    feedback: feedbackValue,
-  };
-
-  fetch(WEB_APP_URL, {
-    method: "POST",
-    body: JSON.stringify(payload),
-  })
-    .then((res) => res.json())
-    .then((res) => {
-      if (res.status === "success") {
-        alert(`Feedback Updated for ${candidateName}`);
-      } else {
-        alert(res.message || "Feedback Update Failed");
-      }
-    })
-    .catch((err) => {
-      console.error(err);
-      alert("Feedback Update Failed");
-    });
-}
-
-// ============================
-// SEARCH + AUTOCOMPLETE
-// ============================
-
-function updateSearchSuggestions(
-  tableBodyId,
-  dataListId
-) {
-  const rows = document.querySelectorAll(
-    `#${tableBodyId} tr`
-  );
-
-  const datalist =
-    document.getElementById(dataListId);
-
-  if (!datalist) return;
-
-  datalist.innerHTML = "";
-
-  let names = [];
-
-  rows.forEach((row) => {
-    const nameCell = row.cells[0];
-
-    if (!nameCell) return;
-
-    const name = nameCell.textContent.trim();
-
-    if (name && !names.includes(name)) {
-      names.push(name);
-
-      const option =
-        document.createElement("option");
-
-      option.value = name;
-
-      datalist.appendChild(option);
-    }
-  });
-}
-
-function runTargetedSearch(
-  searchInputId,
-  tableBodyId
-) {
-  const query = document
-    .getElementById(searchInputId)
-    .value.toLowerCase();
-
-  const rows = document.querySelectorAll(
-    `#${tableBodyId} tr`
-  );
-
-  rows.forEach((row) => {
-    let found = false;
-
-    for (let i = 0; i < 4; i++) {
-      if (row.cells[i]) {
-        const text =
-          row.cells[i].textContent.toLowerCase();
-
-        if (text.includes(query)) {
-          found = true;
-          break;
+        if(driveRes.status==="success") document.getElementById("totalDrivesCount").innerText = driveRes.data.length;
+        if(appRes.status==="success") {
+            let appHtml = "";
+            appRes.data.forEach(app => {
+                let statusBadge = `<span class="status-badge">${app.application_status || "Applied"}</span>`;
+                appHtml += `<tr><td>${new Date(app.timestamp).toLocaleDateString()}</td><td><strong>${app.candidate_name}</strong></td><td>${app.company_name}</td><td>${app.job_title}</td><td>${statusBadge}</td></tr>`;
+            });
+            document.getElementById("adminApplicationsTableBody").innerHTML = appHtml || "<tr><td colspan='5'>No applications</td></tr>";
         }
-      }
-    }
-
-    row.style.display = found ? "" : "none";
-  });
+    }).catch(err=>alert("Admin Error")).finally(()=>hideLoader());
 }
 
 // ============================
-// SEARCH EVENT LISTENERS
+// HR: APPLICATIONS SHEET WITH FEEDBACK
 // ============================
-
-document
-  .getElementById("adminCandidateSearch")
-  ?.addEventListener("input", function () {
-    runTargetedSearch(
-      "adminCandidateSearch",
-      "candidateTableBody"
-    );
-  });
-
-document
-  .getElementById("hrCandidateSearch")
-  ?.addEventListener("input", function () {
-    runTargetedSearch(
-      "hrCandidateSearch",
-      "hrCandidateTableBody"
-    );
-  });
-
-// =================================================================
-// UNIVERSAL COMPATIBLE EXCEL/CSV EXTRACTOR ENGINE
-// =================================================================
-function exportTableToExcel(tableBodyId, filename = 'Candidate_Report') {
-    const tableBody = document.getElementById(tableBodyId);
-    if (!tableBody) return alert("Target metrics data pool not found.");
-
-    const rows = tableBody.querySelectorAll('tr');
-    if (rows.length === 0 || rows[0].querySelector('.placeholder-text')) {
-        return alert("No records available to export.");
-    }
-
-    let csvContent = [];
-    
-    // 1. Build Document Headers based on target context view
-    let headers = ["Candidate Name", "Email Address", "Contact Phone", "Declared Skills"];
-    if (tableBodyId === 'hrCandidateTableBody') {
-        headers.push("Application Status"); // Appends status tracking column context for HR
-    }
-    csvContent.push(headers.map(h => `"${h.replace(/"/g, '""')}"`).join(","));
-
-    // 2. Extract Visible Row Cell Records
-    rows.forEach(row => {
-        // Skip hidden rows (filtered out by search bar) or empty lists
-        if (row.style.display === "none" || row.querySelector('.placeholder-text')) return;
-
-        let rowData = [];
-        
-        // Extract Name (Cell 0), Email (Cell 1), Phone (Cell 2), Skills (Cell 3)
-        for (let i = 0; i < 4; i++) {
-            let cellText = row.cells[i] ? row.cells[i].textContent.trim() : "-";
-            // Clean up name bold tags if present
-            rowData.push(`"${cellText.replace(/"/g, '""')}"`);
-        }
-
-        // Special check: If HR table, read current value of Feedback Selector Dropdown
-        if (tableBodyId === 'hrCandidateTableBody') {
-            const selectElement = row.querySelector('.feedback-select');
-            const feedbackStatus = selectElement ? selectElement.value : "In Process";
-            rowData.push(`"${feedbackStatus}"`);
-        }
-
-        csvContent.push(rowData.join(","));
-    });
-
-    // 3. Compile Stream Blob & Force Local Save Download Pipeline
-    const csvString = "\uFEFF" + csvContent.join("\n"); // Adds UTF-8 BOM flag so Excel displays Indian names/characters properly
-    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-    
-    const link = document.createElement("a");
-    if (link.download !== undefined) {
-        const url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
-        
-        // Append dynamic date badge to sheet file name
-        const dateBadge = new Date().toISOString().slice(0, 10);
-        link.setAttribute("download", `${filename}_${dateBadge}.csv`);
-        
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
+function fetchHRApplications() {
+    showLoader("Loading Applications for HR...");
+    fetch(WEB_APP_URL, { method:"POST", body:JSON.stringify({ action:"getApplications" }) })
+        .then(res=>res.json()).then(res=>{
+            if(res.status!=="success") throw new Error("Failed");
+            let html = "";
+            res.data.forEach((app, idx) => {
+                let currentStatus = app.application_status || "Applied";
+                html += `<tr id="appRow_${idx}">
+                            <td>${new Date(app.timestamp).toLocaleDateString()}</td>
+                            <td><strong>${app.candidate_name}</strong></td>
+                            <td>${app.company_name}</td>
+                            <td>${app.job_title}</td>
+                            <td>
+                                <select id="statusSelect_${idx}" class="feedback-select">
+                                    <option value="Applied" ${currentStatus==="Applied"?"selected":""}>Applied</option>
+                                    <option value="In Process" ${currentStatus==="In Process"?"selected":""}>In Process</option>
+                                    <option value="Selected" ${currentStatus==="Selected"?"selected":""}>Selected</option>
+                                    <option value="Rejected" ${currentStatus==="Rejected"?"selected":""}>Rejected</option>
+                                </select>
+                            </td>
+                            <td><button class="feedback-btn" onclick="updateApplicationFeedback(${idx}, '${app.candidate_name}', '${app.company_name}', '${app.job_title}')">Save Feedback</button></td>
+                         </tr>`;
+            });
+            document.getElementById("hrApplicationsTableBody").innerHTML = html || "<tr><td colspan='6'>No applications received</td></tr>";
+        }).catch(err=>alert("HR Data Error")).finally(()=>hideLoader());
 }
-{
-  const savedRole = localStorage.getItem("userRole");
 
-  if (savedRole === "admin") {
-    switchView("adminView", "Admin Dashboard");
-  }
-
-  else if (savedRole === "hr") {
-    switchView("companyView", "HR Workspace");
-  }
-
-  else if (savedRole === "candidate") {
-    loggedInCandidateName =
-      localStorage.getItem("candidateName") || "";
-
-    switchView(
-      "candidateView",
-      `Welcome ${loggedInCandidateName}`
-    );
-  }
-
-  else {
-    switchView("loginView", "Placement Portal");
-  }
+window.updateApplicationFeedback = function(rowId, candidateName, company, role) {
+    const newStatus = document.getElementById(`statusSelect_${rowId}`).value;
+    const payload = { action:"updateApplicationStatus", candidateName, companyName:company, jobTitle:role, newStatus };
+    fetch(WEB_APP_URL, { method:"POST", body:JSON.stringify(payload) }).then(res=>res.json()).then(res=>{
+        if(res.status==="success") alert(`Feedback updated to ${newStatus} for ${candidateName}`);
+        else alert("Update failed");
+        fetchHRApplications(); // refresh
+    }).catch(err=>alert("Error updating feedback"));
 };
 
-
 // ============================
-// AUTO LOGIN AFTER REFRESH
+// DRIVE & CANDIDATE APPLY LOGIC
 // ============================
+function fetchActiveDrives() {
+    showLoader("Loading Drives...");
+    fetch(WEB_APP_URL, { method:"POST", body:JSON.stringify({ action:"getDrives" }) }).then(res=>res.json()).then(res=>{
+        if(res.status!=="success") return;
+        let grid = "";
+        res.data.forEach(d => {
+            grid += `<div class="drive-card"><h4>${d.job_title}</h4><span class="company-badge">${d.company_name}</span><p><strong>Eligibility:</strong> ${d.eligibility}</p><p><strong>Description:</strong> ${d.job_description}</p><button class="apply-btn" onclick="applyToDrive('${d.company_name.replace(/'/g, "\\'")}', '${d.job_title.replace(/'/g, "\\'")}')">Quick Apply</button></div>`;
+        });
+        document.getElementById("drivesGrid").innerHTML = grid || "<p class='placeholder-text'>No active drives</p>";
+    }).catch(err=>alert("Drive fetch error")).finally(()=>hideLoader());
+}
 
-window.onload = function () {
+window.applyToDrive = function(company, jobTitle) {
+    if(!loggedInCandidateName && localStorage.getItem("candidateName")) loggedInCandidateName = localStorage.getItem("candidateName");
+    if(!loggedInCandidateName) { alert("Please login again"); logout(); return; }
+    const payload = { action:"submitApplication", candidateName:loggedInCandidateName, companyName:company, jobTitle };
+    fetch(WEB_APP_URL, { method:"POST", body:JSON.stringify(payload) }).then(res=>res.json()).then(res=>{ alert(res.status==="success"?"Applied Successfully":res.message); }).catch(err=>alert("Apply failed"));
+};
 
-  const savedRole =
-    localStorage.getItem("userRole");
+document.getElementById("driveForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button');
+    setButtonLoading(btn);
+    fetch(WEB_APP_URL, { method:"POST", body:JSON.stringify({ action:"postDrive", companyName:document.getElementById("compName").value, hrName:document.getElementById("hrName").value, jobTitle:document.getElementById("jobTitle").value, eligibility:document.getElementById("eligibility").value, description:document.getElementById("jobDesc").value }) })
+        .then(res=>res.json()).then(res=>{ alert(res.status==="success"?"Drive Published":res.message); if(res.status==="success") e.target.reset(); }).catch(err=>alert("Error")).finally(()=>removeButtonLoading(btn,"Publish Active Drive"));
+});
 
-  // ================= ADMIN =================
+// SEARCH + EXPORT
+function exportTableToExcel(tableBodyId, filename) {
+    const tbody = document.getElementById(tableBodyId);
+    if(!tbody || tbody.querySelectorAll("tr").length===0) return alert("No data to export");
+    let csv = [];
+    let headers = [];
+    if(tableBodyId === "candidateTableBody") headers = ["Name","Email","Phone","Skills","Resume"];
+    else if(tableBodyId === "adminApplicationsTableBody") headers = ["Date","Candidate","Company","Role","Status"];
+    else headers = ["Date","Candidate","Company","Role","Feedback"];
+    csv.push(headers.map(h=>`"${h}"`).join(","));
+    Array.from(tbody.querySelectorAll("tr")).forEach(row => {
+        let rowData = [];
+        Array.from(row.cells).forEach(cell => rowData.push(`"${cell.innerText.replace(/"/g,'""')}"`));
+        if(rowData.length) csv.push(rowData.join(","));
+    });
+    const blob = new Blob(["\uFEFF" + csv.join("\n")], {type:"text/csv;charset=utf-8;"});
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `${filename}_${new Date().toISOString().slice(0,10)}.csv`;
+    link.click();
+}
 
-  if (savedRole === "admin") {
+document.getElementById("adminCandidateSearch")?.addEventListener("input", function() { filterTable("candidateTableBody", this.value); });
+document.getElementById("adminAppSearch")?.addEventListener("input", function() { filterTable("adminApplicationsTableBody", this.value); });
+document.getElementById("hrAppSearch")?.addEventListener("input", function() { filterTable("hrApplicationsTableBody", this.value); });
+function filterTable(tbodyId, query) {
+    const rows = document.querySelectorAll(`#${tbodyId} tr`);
+    const q = query.toLowerCase();
+    rows.forEach(row => {
+        let text = row.innerText.toLowerCase();
+        row.style.display = text.includes(q) ? "" : "none";
+    });
+}
 
-    switchView(
-      "adminView",
-      "Admin Dashboard"
-    );
-
-    return;
-  }
-
-  // ================= HR =================
-
-  if (savedRole === "hr") {
-
-    switchView(
-      "companyView",
-      "HR Workspace"
-    );
-
-    return;
-  }
-
-  // ================= CANDIDATE =================
-
-  if (savedRole === "candidate") {
-
-    loggedInCandidateName =
-      localStorage.getItem("candidateName") || "";
-
-    switchView(
-      "candidateView",
-      `Welcome ${loggedInCandidateName}`
-    );
-
-    return;
-  }
-
-  // ================= DEFAULT =================
-
-  switchView(
-    "loginView",
-    "Placement Portal"
-  );
+// Auto restore session
+window.onload = () => {
+    const role = localStorage.getItem("userRole");
+    if(role === "admin") switchView("adminView","Admin Dashboard");
+    else if(role === "hr") switchView("companyView","HR Workspace");
+    else if(role === "candidate") { loggedInCandidateName = localStorage.getItem("candidateName") || ""; switchView("candidateView",`Welcome ${loggedInCandidateName}`); }
+    else switchView("loginView","Placement Portal");
 };
