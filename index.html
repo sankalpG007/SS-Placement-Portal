@@ -163,9 +163,20 @@
             <div class="search-container">
     <input type="text" id="hrCandidateSearch" list="hrNameSuggestions" placeholder="Filter candidate pool by name, matching skills...">
     <datalist id="hrNameSuggestions"></datalist>
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+    <p class="subtitle" style="margin:0;">
+        HR exclusive access: Browse registered talent database for custom outreach pipelines.
+    </p>
+
+    <button 
+        onclick="loadHRCandidates()" 
+        class="submit-btn"
+        style="padding:8px 16px; font-size:14px; background:#2563eb;">
+        🔄 Refresh Table
+    </button>
 </div>
-            <p class="subtitle" style="margin-bottom: 15px;">HR exclusive access: Browse registered talent database for custom outreach pipelines.</p>
-            <div class="table-container">
+
+<div class="table-container">
     <table>
         <thead>
     <tr>

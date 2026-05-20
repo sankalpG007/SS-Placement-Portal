@@ -3,7 +3,7 @@
 // ============================
 
 const WEB_APP_URL =
-  "https://script.google.com/macros/s/AKfycbxjEaBaDBMdZ4faG7lOhQDfFG_yBROixHMy8b2wVHmhvAygKZz34Q0FUrzkBIxyamZwZw/exec";
+  "https://script.google.com/macros/s/AKfycbzZB_CpPCXKf3A1CUOv79EgY-d8nozfRJi9yh_cmBwSI1KkzQySOs9fFCt_mG7WlLe4/exec";
 
 let loggedInCandidateName = "";
 
@@ -212,24 +212,22 @@ document
 
       fetch(WEB_APP_URL, {
         method: "POST",
-        mode: "no-cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify(finalPayload),
       })
-        .then(() => {
-          alert("Registration Successful");
-
-          document
-            .getElementById("candidateRegisterForm")
-            .reset();
-
-          toggleAuthMode();
+        .then((res) => res.json())
+        .then((res) => {
+          if (res.status === "success") {
+            alert("Registration Successful");
+            document
+              .getElementById("candidateRegisterForm")
+              .reset();
+            toggleAuthMode();
+          } else {
+            alert(res.message || "Registration Failed");
+          }
         })
         .catch((err) => {
           console.error(err);
-
           alert("Registration Error");
         })
         .finally(() => {
@@ -307,26 +305,50 @@ function logout() {
 }
 
 // ============================
-// FETCH HR CANDIDATES
+// FETCH HR CANDIDATES (FIXED)
 // ============================
 
 function fetchCandidatesForHR() {
   showLoader("Loading Candidates...");
 
-  fetch(`${WEB_APP_URL}?target=Candidates`)
+  // Use POST method with action to get candidates
+  const payload = {
+    action: "getCandidates"
+  };
+
+  fetch(WEB_APP_URL, {
+    method: "POST",
+    body: JSON.stringify(payload)
+  })
     .then((res) => res.json())
     .then((res) => {
-      if (res.status !== "success") return;
+      if (res.status !== "success") {
+        console.error("Failed to load candidates:", res.message);
+        return;
+      }
 
       let tableHTML = "";
 
       res.data.forEach((user) => {
         let resumeDisplay = "No Resume";
 
-        if (
-          user.resume_link &&
-          user.resume_link.startsWith("data:")
-        ) {
+        // Check if resume_link contains a HYPERLINK formula or data URL
+        if (user.resume_link && user.resume_link.includes("HYPERLINK")) {
+          // Extract URL from HYPERLINK formula
+          const urlMatch = user.resume_link.match(/HYPERLINK\("([^"]+)"/);
+          if (urlMatch && urlMatch[1]) {
+            resumeDisplay = `
+              <a 
+                href="${urlMatch[1]}" 
+                download="${user.name}_Resume.pdf"
+                class="resume-link"
+                target="_blank"
+              >
+                Download Resume
+              </a>
+            `;
+          }
+        } else if (user.resume_link && user.resume_link.startsWith("data:")) {
           resumeDisplay = `
             <a 
               href="${user.resume_link}" 
@@ -340,66 +362,38 @@ function fetchCandidatesForHR() {
 
         tableHTML += `
           <tr>
-
             <td><strong>${user.name || "-"}</strong></td>
-
             <td>${user.email || "-"}</td>
-
             <td>${user.phone || "-"}</td>
-
             <td>${user.skills || "-"}</td>
-
             <td>${resumeDisplay}</td>
-
             <td>
               <select 
                 id="feedback_${user.email}"
                 class="feedback-select"
               >
-
                 <option value="In Process"
-                  ${
-                    user.feedback === "In Process"
-                      ? "selected"
-                      : ""
-                  }
+                  ${user.feedback === "In Process" ? "selected" : ""}
                 >
                   In Process
                 </option>
-
                 <option value="Selected"
-                  ${
-                    user.feedback === "Selected"
-                      ? "selected"
-                      : ""
-                  }
+                  ${user.feedback === "Selected" ? "selected" : ""}
                 >
                   Selected
                 </option>
-
                 <option value="Rejected"
-                  ${
-                    user.feedback === "Rejected"
-                      ? "selected"
-                      : ""
-                  }
+                  ${user.feedback === "Rejected" ? "selected" : ""}
                 >
                   Rejected
                 </option>
-
                 <option value="On Hold"
-                  ${
-                    user.feedback === "On Hold"
-                      ? "selected"
-                      : ""
-                  }
+                  ${user.feedback === "On Hold" ? "selected" : ""}
                 >
                   On Hold
                 </option>
-
               </select>
             </td>
-
             <td>
               <button
                 class="feedback-btn"
@@ -408,7 +402,6 @@ function fetchCandidatesForHR() {
                 Save
               </button>
             </td>
-
           </tr>
         `;
       });
@@ -432,12 +425,19 @@ function fetchCandidatesForHR() {
     })
     .catch((err) => {
       console.error(err);
-
       alert("Unable to load candidates");
     })
     .finally(() => {
       hideLoader();
     });
+}
+
+// ============================
+// LOAD HR CANDIDATES (Wrapper function for refresh button)
+// ============================
+
+function loadHRCandidates() {
+  fetchCandidatesForHR();
 }
 
 // ============================
@@ -448,17 +448,20 @@ function fetchAdminMetrics() {
   showLoader("Loading Dashboard Metrics...");
 
   Promise.all([
-    fetch(`${WEB_APP_URL}?target=Candidates`).then((r) =>
-      r.json()
-    ),
-
-    fetch(`${WEB_APP_URL}?target=Drives`).then((r) =>
-      r.json()
-    ),
-
-    fetch(`${WEB_APP_URL}?target=Applications`).then((r) =>
-      r.json()
-    ),
+    fetch(WEB_APP_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "getCandidates" })
+    }).then((r) => r.json()),
+    
+    fetch(WEB_APP_URL, {
+      method: "POST", 
+      body: JSON.stringify({ action: "getDrives" })
+    }).then((r) => r.json()),
+    
+    fetch(WEB_APP_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "getApplications" })
+    }).then((r) => r.json())
   ])
     .then(([candidateRes, driveRes, appRes]) => {
       // ================= CANDIDATES =================
@@ -473,10 +476,21 @@ function fetchAdminMetrics() {
         candidateRes.data.forEach((user) => {
           let resumeDisplay = "No Resume";
 
-          if (
-            user.resume_link &&
-            user.resume_link.startsWith("data:")
-          ) {
+          if (user.resume_link && user.resume_link.includes("HYPERLINK")) {
+            const urlMatch = user.resume_link.match(/HYPERLINK\("([^"]+)"/);
+            if (urlMatch && urlMatch[1]) {
+              resumeDisplay = `
+                <a 
+                  href="${urlMatch[1]}"
+                  download="${user.name}_Resume.pdf"
+                  class="resume-link"
+                  target="_blank"
+                >
+                  Download Resume
+                </a>
+              `;
+            }
+          } else if (user.resume_link && user.resume_link.startsWith("data:")) {
             resumeDisplay = `
               <a 
                 href="${user.resume_link}"
@@ -490,17 +504,11 @@ function fetchAdminMetrics() {
 
           tableHTML += `
             <tr>
-
               <td><strong>${user.name}</strong></td>
-
               <td>${user.email}</td>
-
               <td>${user.phone}</td>
-
               <td>${user.skills}</td>
-
               <td>${resumeDisplay}</td>
-
             </tr>
           `;
         });
@@ -533,27 +541,19 @@ function fetchAdminMetrics() {
 
           appHTML += `
             <tr>
-
               <td>${dateObj.toLocaleDateString()}</td>
-
               <td>
                 <strong>
                   ${item.candidate_name || "-"}
                 </strong>
               </td>
-
               <td>${item.company_name || "-"}</td>
-
               <td>${item.job_title || "-"}</td>
-
               <td>
                 <span class="status-badge">
-                  ${
-                    item.application_status || "Applied"
-                  }
+                  ${item.application_status || "Applied"}
                 </span>
               </td>
-
             </tr>
           `;
         });
@@ -573,7 +573,6 @@ function fetchAdminMetrics() {
     })
     .catch((err) => {
       console.error(err);
-
       alert("Dashboard Error");
     })
     .finally(() => {
@@ -599,15 +598,11 @@ document
       action: "postDrive",
       companyName:
         document.getElementById("compName").value,
-
       hrName: document.getElementById("hrName").value,
-
       jobTitle:
         document.getElementById("jobTitle").value,
-
       eligibility:
         document.getElementById("eligibility").value,
-
       description:
         document.getElementById("jobDesc").value,
     };
@@ -616,16 +611,18 @@ document
       method: "POST",
       body: JSON.stringify(drivePayload),
     })
-      .then(() => {
-        alert("Placement Drive Published");
-
-        document.getElementById("driveForm").reset();
-
-        fetchActiveDrives();
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.status === "success") {
+          alert("Placement Drive Published");
+          document.getElementById("driveForm").reset();
+          fetchActiveDrives();
+        } else {
+          alert(res.message || "Drive Publish Failed");
+        }
       })
       .catch((err) => {
         console.error(err);
-
         alert("Drive Publish Failed");
       })
       .finally(() => {
@@ -640,7 +637,14 @@ document
 function fetchActiveDrives() {
   showLoader("Loading Active Drives...");
 
-  fetch(`${WEB_APP_URL}?target=Drives`)
+  const payload = {
+    action: "getDrives"
+  };
+
+  fetch(WEB_APP_URL, {
+    method: "POST",
+    body: JSON.stringify(payload)
+  })
     .then((res) => res.json())
     .then((res) => {
       if (res.status !== "success") return;
@@ -650,38 +654,26 @@ function fetchActiveDrives() {
       res.data.forEach((drive) => {
         gridHTML += `
           <div class="drive-card">
-
             <h4>
               ${drive.job_title || "Open Position"}
             </h4>
-
             <span class="company-badge">
-              ${
-                drive.company_name ||
-                "Anonymous Recruiter"
-              }
+              ${drive.company_name || "Anonymous Recruiter"}
             </span>
-
             <p>
               <strong>Eligibility:</strong>
               ${drive.eligibility || "Open"}
             </p>
-
             <p>
               <strong>Description:</strong>
-              ${
-                drive.job_description ||
-                "No description"
-              }
+              ${drive.job_description || "No description"}
             </p>
-
             <button
               class="apply-btn"
               onclick="applyToDrive(this,'${drive.company_name}','${drive.job_title}')"
             >
               Quick Apply
             </button>
-
           </div>
         `;
       });
@@ -696,7 +688,6 @@ function fetchActiveDrives() {
     })
     .catch((err) => {
       console.error(err);
-
       alert("Unable to fetch drives");
     })
     .finally(() => {
@@ -726,16 +717,17 @@ function applyToDrive(
     method: "POST",
     body: JSON.stringify(payload),
   })
-    .then(() => {
-      alert(
-        `Application Submitted for ${jobTitle}`
-      );
-
-      fetchMyApplications();
+    .then((res) => res.json())
+    .then((res) => {
+      if (res.status === "success") {
+        alert(`Application Submitted for ${jobTitle}`);
+        fetchMyApplications();
+      } else {
+        alert(res.message || "Application Failed");
+      }
     })
     .catch((err) => {
       console.error(err);
-
       alert("Application Failed");
     })
     .finally(() => {
@@ -748,7 +740,14 @@ function applyToDrive(
 // ============================
 
 function fetchMyApplications() {
-  fetch(`${WEB_APP_URL}?target=Applications`)
+  const payload = {
+    action: "getApplications"
+  };
+
+  fetch(WEB_APP_URL, {
+    method: "POST",
+    body: JSON.stringify(payload)
+  })
     .then((res) => res.json())
     .then((res) => {
       if (res.status !== "success") return;
@@ -764,19 +763,13 @@ function fetchMyApplications() {
       myApps.forEach((app) => {
         html += `
           <tr>
-
             <td>${app.company_name}</td>
-
             <td>${app.job_title}</td>
-
             <td>
               <span class="status-badge">
-                ${
-                  app.application_status || "Applied"
-                }
+                ${app.application_status || "Applied"}
               </span>
             </td>
-
           </tr>
         `;
       });
@@ -797,6 +790,9 @@ function fetchMyApplications() {
             </tr>
           `;
       }
+    })
+    .catch((err) => {
+      console.error(err);
     });
 }
 
@@ -823,14 +819,16 @@ function updateCandidateFeedback(
     method: "POST",
     body: JSON.stringify(payload),
   })
-    .then(() => {
-      alert(
-        `Feedback Updated for ${candidateName}`
-      );
+    .then((res) => res.json())
+    .then((res) => {
+      if (res.status === "success") {
+        alert(`Feedback Updated for ${candidateName}`);
+      } else {
+        alert(res.message || "Feedback Update Failed");
+      }
     })
     .catch((err) => {
       console.error(err);
-
       alert("Feedback Update Failed");
     });
 }
