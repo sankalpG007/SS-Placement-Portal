@@ -87,6 +87,13 @@
             
             <h3>Live Candidate Database (Global View)</h3>
             <div class="search-container">
+                <div class="search-container">
+    <input type="text" id="adminCandidateSearch" list="adminNameSuggestions" placeholder="Search candidates by name, email, or core skills...">
+    <datalist id="adminNameSuggestions"></datalist>
+</div>
+<button class="export-btn" onclick="exportTableToExcel('candidateTableBody', 'Admin_Candidate_Database')" style="background-color: #10b981; color: white; padding: 10px 16px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+    📊 Export Live Candidates Pool (Excel/CSV)
+</button>
     <input type="text" id="adminCandidateSearch" list="adminNameSuggestions" placeholder="Search candidates by name, email, or core skills...">
     <datalist id="adminNameSuggestions"></datalist>
 </div>
@@ -126,6 +133,13 @@
 
      <!-- HR View with drive creation form and candidate search -->
         <div id="companyView" class="view-panel">
+            <div class="search-container">
+    <input type="text" id="hrCandidateSearch" list="hrNameSuggestions" placeholder="Filter candidate pool by name, matching skills...">
+    <datalist id="hrNameSuggestions"></datalist>
+</div>
+<button class="export-btn" onclick="exportTableToExcel('hrCandidateTableBody', 'HR_Candidate_Pool')" style="background-color: #10b981; color: white; padding: 10px 16px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+    📊 Download Filtered Candidates Pool (Excel/CSV)
+</button>
             <div class="form-wrapper" style="margin-bottom: 40px;">
                 <h2 class="form-title">Create a Placement Drive</h2>
                 <p class="subtitle">Fill out the parameters below to open an application drive.</p>

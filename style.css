@@ -415,3 +415,14 @@ th {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }
+
+/* Export Button Interaction Accent */
+.export-btn {
+    transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+}
+.export-btn:hover {
+    background-color: #059669 !important; /* Deeper professional green emerald tone */
+}
+.export-btn:active {
+    transform: scale(0.98); /* Native press haptic indentation effect */
+}

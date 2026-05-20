@@ -934,3 +934,68 @@ document
 window.onload = () => {
   switchView("loginView", "Placement Portal");
 };
+
+// =================================================================
+// UNIVERSAL COMPATIBLE EXCEL/CSV EXTRACTOR ENGINE
+// =================================================================
+function exportTableToExcel(tableBodyId, filename = 'Candidate_Report') {
+    const tableBody = document.getElementById(tableBodyId);
+    if (!tableBody) return alert("Target metrics data pool not found.");
+
+    const rows = tableBody.querySelectorAll('tr');
+    if (rows.length === 0 || rows[0].querySelector('.placeholder-text')) {
+        return alert("No records available to export.");
+    }
+
+    let csvContent = [];
+    
+    // 1. Build Document Headers based on target context view
+    let headers = ["Candidate Name", "Email Address", "Contact Phone", "Declared Skills"];
+    if (tableBodyId === 'hrCandidateTableBody') {
+        headers.push("Application Status"); // Appends status tracking column context for HR
+    }
+    csvContent.push(headers.map(h => `"${h.replace(/"/g, '""')}"`).join(","));
+
+    // 2. Extract Visible Row Cell Records
+    rows.forEach(row => {
+        // Skip hidden rows (filtered out by search bar) or empty lists
+        if (row.style.display === "none" || row.querySelector('.placeholder-text')) return;
+
+        let rowData = [];
+        
+        // Extract Name (Cell 0), Email (Cell 1), Phone (Cell 2), Skills (Cell 3)
+        for (let i = 0; i < 4; i++) {
+            let cellText = row.cells[i] ? row.cells[i].textContent.trim() : "-";
+            // Clean up name bold tags if present
+            rowData.push(`"${cellText.replace(/"/g, '""')}"`);
+        }
+
+        // Special check: If HR table, read current value of Feedback Selector Dropdown
+        if (tableBodyId === 'hrCandidateTableBody') {
+            const selectElement = row.querySelector('.feedback-select');
+            const feedbackStatus = selectElement ? selectElement.value : "In Process";
+            rowData.push(`"${feedbackStatus}"`);
+        }
+
+        csvContent.push(rowData.join(","));
+    });
+
+    // 3. Compile Stream Blob & Force Local Save Download Pipeline
+    const csvString = "\uFEFF" + csvContent.join("\n"); // Adds UTF-8 BOM flag so Excel displays Indian names/characters properly
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    
+    const link = document.createElement("a");
+    if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        
+        // Append dynamic date badge to sheet file name
+        const dateBadge = new Date().toISOString().slice(0, 10);
+        link.setAttribute("download", `${filename}_${dateBadge}.csv`);
+        
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+}
