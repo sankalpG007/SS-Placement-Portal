@@ -938,14 +938,6 @@ document
     );
   });
 
-// ============================
-// AUTO START
-// ============================
-
-window.onload = () => {
-  switchView("loginView", "Placement Portal");
-};
-
 // =================================================================
 // UNIVERSAL COMPATIBLE EXCEL/CSV EXTRACTOR ENGINE
 // =================================================================
@@ -1034,4 +1026,61 @@ function exportTableToExcel(tableBodyId, filename = 'Candidate_Report') {
   else {
     switchView("loginView", "Placement Portal");
   }
+};
+
+
+// ============================
+// AUTO LOGIN AFTER REFRESH
+// ============================
+
+window.onload = function () {
+
+  const savedRole =
+    localStorage.getItem("userRole");
+
+  // ================= ADMIN =================
+
+  if (savedRole === "admin") {
+
+    switchView(
+      "adminView",
+      "Admin Dashboard"
+    );
+
+    return;
+  }
+
+  // ================= HR =================
+
+  if (savedRole === "hr") {
+
+    switchView(
+      "companyView",
+      "HR Workspace"
+    );
+
+    return;
+  }
+
+  // ================= CANDIDATE =================
+
+  if (savedRole === "candidate") {
+
+    loggedInCandidateName =
+      localStorage.getItem("candidateName") || "";
+
+    switchView(
+      "candidateView",
+      `Welcome ${loggedInCandidateName}`
+    );
+
+    return;
+  }
+
+  // ================= DEFAULT =================
+
+  switchView(
+    "loginView",
+    "Placement Portal"
+  );
 };
