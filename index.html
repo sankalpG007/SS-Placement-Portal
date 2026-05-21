@@ -3,34 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SS Infotech | Placement Command Center</title>
+    <title>SS Infotech | Placement Provider Portal</title>
+    <!-- CSS styles have been removed - link to your external style.css file -->
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- No internal CSS - all styles should be in your external style.css file -->
 </head>
 <body>
 
 <header>
-    <div id="portalTitle"><i class="fas fa-briefcase"></i> SS Infotech · Placement Nexus</div>
-    <button id="logoutBtn" class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Exit</button>
+    <div id="portalTitle"><i class="fas fa-briefcase"></i> SS Infotech · Placement Provider</div>
+    <button id="logoutBtn" class="logout-btn" onclick="logout()" style="display: none;"><i class="fas fa-sign-out-alt"></i> Exit</button>
 </header>
 
 <div id="loadingOverlay" class="loading-overlay">
     <div class="spinner"></div>
-    <p>Synchronizing database • please wait...</p>
+    <p style="color: white; margin-top: 20px;">Synchronizing database • please wait...</p>
 </div>
 
 <div class="container">
     <!-- LOGIN VIEW -->
     <div id="loginView" class="view-panel active-view">
         <div class="login-card">
-            <h2><i class="fas fa-shield-alt"></i> Access Portal</h2>
-            <p class="subtitle">Secure gateway for Admin • HR • Candidates</p>
+            <h2><i class="fas fa-shield-alt"></i> SS Infotech Portal</h2>
+            <p class="subtitle">Access for Admin • HR Partners • Candidates</p>
             
             <form id="loginForm">
                 <div class="form-group">
                     <label><i class="far fa-envelope"></i> Email / Username</label>
-                    <input type="text" id="loginUser" placeholder="admin / hr / candidate@email.com" required>
+                    <input type="text" id="loginUser" placeholder="admin / hrpartner / candidate@email.com" required>
                 </div>
                 <div class="form-group">
                     <label><i class="fas fa-lock"></i> Password</label>
@@ -58,78 +60,72 @@
     <!-- ADMIN VIEW -->
     <div id="adminView" class="view-panel">
         <div class="stats-grid">
-            <div class="stat-card unique-blue-card"><h3><i class="fas fa-users"></i> Registered Candidates</h3><p id="totalCandidatesCount">0</p></div>
-            <div class="stat-card unique-green-card"><h3><i class="fas fa-bullhorn"></i> Active Drives</h3><p id="totalDrivesCount">0</p></div>
+            <div class="stat-card"><h3><i class="fas fa-users"></i> Registered Candidates</h3><p id="totalCandidatesCount">0</p></div>
+            <div class="stat-card"><h3><i class="fas fa-bullhorn"></i> Active Drives</h3><p id="totalDrivesCount">0</p></div>
+            <div class="stat-card"><h3><i class="fas fa-star"></i> Avg Feedback Rating</h3><p id="avgRating">0</p></div>
+            <div class="stat-card"><h3><i class="fas fa-comment-dots"></i> Total Feedbacks</h3><p id="totalFeedbacks">0</p></div>
         </div>
         
-        <!-- ADMIN: REGISTERED CANDIDATES SHEET -->
-        <h3><i class="fas fa-database"></i> 📋 Registered Candidates Sheet</h3>
-        <div class="search-container">
-            <input type="text" id="adminCandidateSearch" placeholder="🔍 Search by name, email, or skills...">
-        </div>
-        <button class="export-btn" onclick="exportTableToExcel('candidateTableBody', 'Registered_Candidates')"><i class="fas fa-file-excel"></i> Export Registered Candidates</button>
+        <h3><i class="fas fa-database"></i> Registered Candidates</h3>
+        <div class="search-container"><input type="text" id="adminCandidateSearch" placeholder="Search..."></div>
+        <button class="export-btn" onclick="exportTableToExcel('candidateTableBody', 'Registered_Candidates')"><i class="fas fa-file-excel"></i> Export</button>
         <div class="table-container">
             <table>
-                <thead>
-                    <tr><th>Name</th><th>Email</th><th>Phone</th><th>Skills</th><th>Resume</th></tr>
-                </thead>
-                <tbody id="candidateTableBody">
-                    <tr><td colspan="5" class="placeholder-text">Loading registered candidates...</td></tr>
-                </tbody>
+                <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Skills</th><th>Resume</th></tr></thead>
+                <tbody id="candidateTableBody"><tr><td colspan="5" class="placeholder-text">Loading...</td></tr></tbody>
             </table>
         </div>
         
-        <!-- ADMIN: APPLICATIONS SHEET -->
-        <h3><i class="fas fa-paper-plane"></i> 📄 All Applications Sheet (with HR Feedback)</h3>
-        <div class="search-container">
-            <input type="text" id="adminAppSearch" placeholder="🔍 Search by candidate, company, role...">
+        <h3><i class="fas fa-paper-plane"></i> Applications & Drives</h3>
+        <div class="search-container"><input type="text" id="adminAppSearch" placeholder="Search..."></div>
+        <button class="export-btn" onclick="exportTableToExcel('adminApplicationsTableBody', 'All_Applications')"><i class="fas fa-file-excel"></i> Export</button>
+        <div class="table-container">
+            <table>
+                <thead><tr><th>Date</th><th>Candidate</th><th>Company</th><th>Role</th><th>Status</th></tr></thead>
+                <tbody id="adminApplicationsTableBody"><tr><td colspan="5" class="placeholder-text">Loading...</td></tr></tbody>
+            </table>
         </div>
-        <button class="export-btn" onclick="exportTableToExcel('adminApplicationsTableBody', 'All_Applications_Feedback')"><i class="fas fa-file-excel"></i> Export Applications Sheet</button>
+        
+        <h3><i class="fas fa-comment-dots"></i> Candidate Feedback for SS Infotech</h3>
+        <div class="search-container"><input type="text" id="feedbackSearch" placeholder="Search..."></div>
+        <button class="export-btn" onclick="exportTableToExcel('feedbackTableBody', 'SS_Infotech_Feedback')"><i class="fas fa-file-excel"></i> Export Feedback</button>
         <div class="table-container">
             <table>
                 <thead>
-                    <tr><th>Date</th><th>Candidate</th><th>Company</th><th>Role</th><th>HR Feedback Status</th></tr>
+                    <tr>
+                        <th>Date</th><th>Candidate Name</th><th>Email</th><th>Avg Rating</th>
+                        <th>Q1: Overall</th><th>Q2: Organization</th><th>Q3: Communication</th>
+                        <th>Q4: Interview</th><th>Q5: Updates</th><th>Q6: Support</th>
+                        <th>Q7: Transparency</th><th>Q8: Document</th><th>Q9: Post-Placement</th>
+                        <th>Q10: Recommend</th><th>Comments</th>
+                    </tr>
                 </thead>
-                <tbody id="adminApplicationsTableBody">
-                    <tr><td colspan="5" class="placeholder-text">Loading applications...</td></tr>
-                </tbody>
+                <tbody id="feedbackTableBody"><tr><td colspan="15" class="placeholder-text">Loading feedback...</td></tr></tbody>
             </table>
         </div>
     </div>
 
-    <!-- HR VIEW -->
+    <!-- HR PARTNER VIEW -->
     <div id="companyView" class="view-panel">
-        <div class="form-wrapper">
-            <h2 class="form-title"><i class="fas fa-plus-circle"></i> Create Placement Drive</h2>
+        <div class="login-card" style="max-width: 800px;">
+            <h2><i class="fas fa-plus-circle"></i> Create Placement Drive</h2>
             <form id="driveForm">
-                <div class="form-row">
-                    <div class="form-group"><label>Company Name</label><input type="text" id="compName" required></div>
-                    <div class="form-group"><label>HR Recruiter</label><input type="text" id="hrName" required></div>
-                </div>
+                <div class="form-group"><label>Company Name</label><input type="text" id="compName" required></div>
+                <div class="form-group"><label>HR Recruiter</label><input type="text" id="hrName" required></div>
                 <div class="form-group"><label>Job Title Role</label><input type="text" id="jobTitle" required></div>
                 <div class="form-group"><label>Eligibility Criteria</label><input type="text" id="eligibility" required></div>
-                <div class="form-group"><label>Job Description</label><textarea id="jobDesc" rows="3" placeholder="Tech stacks, responsibilities..."></textarea></div>
-                <button type="submit" class="submit-btn"><i class="fas fa-bullhorn"></i> Publish Active Drive</button>
+                <div class="form-group"><label>Job Description</label><textarea id="jobDesc" rows="3"></textarea></div>
+                <button type="submit" class="submit-btn"><i class="fas fa-bullhorn"></i> Publish Drive</button>
             </form>
         </div>
         
-        <hr>
-        
-        <!-- HR: APPLICATIONS SHEET WITH FEEDBACK FUNCTIONALITY -->
-        <h3><i class="fas fa-users"></i> 🎯 Drive Applications & Feedback Panel</h3>
-        <p class="subtitle">Candidates who applied for drives — update their selection status</p>
-        <div class="search-container">
-            <input type="text" id="hrAppSearch" placeholder="🔍 Filter by candidate name, company, role...">
-        </div>
-        <button class="export-btn" onclick="exportTableToExcel('hrApplicationsTableBody', 'HR_Applications_Feedback')"><i class="fas fa-download"></i> Export Applications with Feedback</button>
+        <h3><i class="fas fa-users"></i> Applications Received</h3>
+        <div class="search-container"><input type="text" id="hrAppSearch" placeholder="Filter..."></div>
+        <button class="export-btn" onclick="exportTableToExcel('hrApplicationsTableBody', 'HR_Applications')"><i class="fas fa-download"></i> Export</button>
         <div class="table-container">
             <table>
-                <thead>
-                    <tr><th>Date</th><th>Candidate Name</th><th>Company</th><th>Job Role</th><th>Feedback Status</th><th>Update Action</th></tr>
-                </thead>
-                <tbody id="hrApplicationsTableBody">
-                    <tr><td colspan="6" class="placeholder-text">Loading applications...</td></tr>
-                </tbody>
+                <thead><tr><th>Date</th><th>Candidate</th><th>Company</th><th>Role</th><th>Status</th><th>Update</th></tr></thead>
+                <tbody id="hrApplicationsTableBody"><tr><td colspan="6" class="placeholder-text">Loading...</td></tr></tbody>
             </table>
         </div>
     </div>
@@ -137,13 +133,119 @@
     <!-- CANDIDATE VIEW -->
     <div id="candidateView" class="view-panel">
         <h2><i class="fas fa-rocket"></i> Available Placement Drives</h2>
-        <p class="subtitle">Apply directly to active opportunities</p>
-        <div id="drivesGrid" class="drives-grid">
-            <p class="placeholder-text">Fetching latest drives...</p>
+        <div id="drivesGrid" class="drives-grid"><p class="placeholder-text">Fetching drives...</p></div>
+        
+        <hr style="margin: 40px 0;">
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 28px; color: white;">
+            <h2 style="color: white;"><i class="fas fa-comment-dots"></i> Share Your Feedback About SS Infotech</h2>
+            <p style="color: rgba(255,255,255,0.9);">Help us improve our placement services! Rate us on the following parameters (1-5, 5=Excellent)</p>
+        </div>
+        
+        <div class="feedback-form-wrapper">
+            <div class="question-card">
+                <p><strong>Q1.</strong> How would you rate your overall experience with SS Infotech placement services?</p>
+                <select id="q1" class="rating-select">
+                    <option value="0">Select Rating</option><option value="5">5 - Excellent</option>
+                    <option value="4">4 - Good</option><option value="3">3 - Average</option>
+                    <option value="2">2 - Poor</option><option value="1">1 - Very Poor</option>
+                </select>
+            </div>
+            <div class="question-card">
+                <p><strong>Q2.</strong> How well were the placement drives organized by SS Infotech?</p>
+                <select id="q2" class="rating-select">
+                    <option value="0">Select Rating</option><option value="5">5 - Excellent</option>
+                    <option value="4">4 - Good</option><option value="3">3 - Average</option>
+                    <option value="2">2 - Poor</option><option value="1">1 - Very Poor</option>
+                </select>
+            </div>
+            <div class="question-card">
+                <p><strong>Q3.</strong> How was the communication from SS Infotech team?</p>
+                <select id="q3" class="rating-select">
+                    <option value="0">Select Rating</option><option value="5">5 - Excellent</option>
+                    <option value="4">4 - Good</option><option value="3">3 - Average</option>
+                    <option value="2">2 - Poor</option><option value="1">1 - Very Poor</option>
+                </select>
+            </div>
+            <div class="question-card">
+                <p><strong>Q4.</strong> How would you rate the interview coordination process?</p>
+                <select id="q4" class="rating-select">
+                    <option value="0">Select Rating</option><option value="5">5 - Excellent</option>
+                    <option value="4">4 - Good</option><option value="3">3 - Average</option>
+                    <option value="2">2 - Poor</option><option value="1">1 - Very Poor</option>
+                </select>
+            </div>
+            <div class="question-card">
+                <p><strong>Q5.</strong> Were you updated timely about drive schedules and results?</p>
+                <select id="q5" class="rating-select">
+                    <option value="0">Select Rating</option><option value="5">5 - Always</option>
+                    <option value="4">4 - Most Times</option><option value="3">3 - Sometimes</option>
+                    <option value="2">2 - Rarely</option><option value="1">1 - Never</option>
+                </select>
+            </div>
+            <div class="question-card">
+                <p><strong>Q6.</strong> How supportive was the SS Infotech team throughout the process?</p>
+                <select id="q6" class="rating-select">
+                    <option value="0">Select Rating</option><option value="5">5 - Very Supportive</option>
+                    <option value="4">4 - Supportive</option><option value="3">3 - Neutral</option>
+                    <option value="2">2 - Unsupportive</option><option value="1">1 - Very Unsupportive</option>
+                </select>
+            </div>
+            <div class="question-card">
+                <p><strong>Q7.</strong> How transparent was the selection process?</p>
+                <select id="q7" class="rating-select">
+                    <option value="0">Select Rating</option><option value="5">5 - Completely Transparent</option>
+                    <option value="4">4 - Mostly Transparent</option>
+                    <option value="3">3 - Somewhat Transparent</option>
+                    <option value="2">2 - Not Transparent</option>
+                    <option value="1">1 - Hidden Process</option>
+                </select>
+            </div>
+            <div class="question-card">
+                <p><strong>Q8.</strong> How would you rate the document submission and verification process?</p>
+                <select id="q8" class="rating-select">
+                    <option value="0">Select Rating</option><option value="5">5 - Very Smooth</option>
+                    <option value="4">4 - Smooth</option>
+                    <option value="3">3 - Average</option>
+                    <option value="2">2 - Difficult</option>
+                    <option value="1">1 - Very Difficult</option>
+                </select>
+            </div>
+            <div class="question-card">
+                <p><strong>Q9.</strong> How would you rate the post-placement support from SS Infotech?</p>
+                <select id="q9" class="rating-select">
+                    <option value="0">Select Rating</option><option value="5">5 - Excellent</option>
+                    <option value="4">4 - Good</option><option value="3">3 - Average</option>
+                    <option value="2">2 - Poor</option><option value="1">1 - Very Poor</option>
+                </select>
+            </div>
+            <div class="question-card">
+                <p><strong>Q10.</strong> How likely are you to recommend SS Infotech to other job seekers?</p>
+                <select id="q10" class="rating-select">
+                    <option value="0">Select Rating</option><option value="5">5 - Definitely</option>
+                    <option value="4">4 - Likely</option>
+                    <option value="3">3 - Maybe</option>
+                    <option value="2">2 - Unlikely</option>
+                    <option value="1">1 - Never</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Additional Comments / Suggestions for SS Infotech</label>
+                <textarea id="additionalComments" rows="3" placeholder="Please share any suggestions to help us improve..."></textarea>
+            </div>
+            <button class="submit-btn" onclick="submitFeedbackToSSInfotech()"><i class="fas fa-paper-plane"></i> Submit Feedback to SS Infotech</button>
         </div>
     </div>
 </div>
 
+<script>
+    // Placeholder functions for the buttons - your actual app.js should handle these
+    function logout() { console.log("logout triggered"); }
+    function toggleAuthMode() { console.log("toggle auth mode"); }
+    function exportTableToExcel(tableId, filename) { console.log("export", tableId, filename); }
+    function submitFeedbackToSSInfotech() { console.log("feedback submitted"); }
+    console.log("CSS has been removed — using external style.css");
+</script>
 <script src="app.js"></script>
 </body>
 </html>

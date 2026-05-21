@@ -38,12 +38,6 @@ header {
     gap: 10px;
 }
 
-#portalTitle i {
-    background: none;
-    color: #ffd966;
-    font-size: 1.6rem;
-}
-
 .logout-btn {
     background: rgba(220, 38, 38, 0.9);
     border: none;
@@ -86,14 +80,8 @@ header {
 }
 
 @keyframes fadeSlideUp {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .login-card {
@@ -136,7 +124,7 @@ header {
     margin-bottom: 6px;
 }
 
-.form-group input, .form-group textarea {
+.form-group input, .form-group textarea, .form-group select {
     width: 100%;
     padding: 12px 14px;
     border: 1.5px solid #e2e8f0;
@@ -145,7 +133,7 @@ header {
     transition: all 0.2s;
 }
 
-.form-group input:focus, .form-group textarea:focus {
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus {
     border-color: #3b82f6;
     outline: none;
     box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
@@ -191,12 +179,6 @@ header {
     color: white;
 }
 
-hr {
-    margin: 20px 0;
-    border: 0;
-    border-top: 1.5px solid #eef2ff;
-}
-
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -208,17 +190,13 @@ hr {
     background: #ffffff;
     padding: 24px 20px;
     border-radius: 28px;
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.02);
     border: 1px solid #eef2ff;
 }
 
-.unique-blue-card {
-    border-left: 6px solid #3b82f6;
-}
-
-.unique-green-card {
-    border-left: 6px solid #10b981;
-}
+.unique-blue-card { border-left: 6px solid #3b82f6; }
+.unique-green-card { border-left: 6px solid #10b981; }
+.unique-purple-card { border-left: 6px solid #8b5cf6; }
+.unique-orange-card { border-left: 6px solid #f59e0b; }
 
 .stat-card h3 {
     font-size: 0.85rem;
@@ -235,7 +213,6 @@ hr {
 }
 
 .table-container {
-    width: 100%;
     overflow-x: auto;
     border-radius: 24px;
     border: 1px solid #edf2f7;
@@ -256,71 +233,13 @@ th {
     font-weight: 700;
     color: #1e293b;
     border-bottom: 1px solid #e2e8f0;
+    text-align: left;
 }
 
 td {
     padding: 14px 12px;
     border-bottom: 1px solid #f0f2f5;
     color: #1f2a44;
-}
-
-.placeholder-text {
-    color: #94a3b8;
-    text-align: center;
-    padding: 32px;
-}
-
-.search-container {
-    width: 100%;
-    margin: 20px 0 20px 0;
-    position: relative;
-}
-
-.search-container input {
-    width: 100%;
-    padding: 14px 18px 14px 48px;
-    font-size: 0.95rem;
-    border: 2px solid #e2e8f0;
-    border-radius: 48px;
-    background: #ffffff;
-    transition: all 0.2s;
-}
-
-.search-container input:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-    outline: none;
-}
-
-.search-container::before {
-    content: "\f002";
-    font-family: "Font Awesome 6 Free";
-    font-weight: 900;
-    position: absolute;
-    left: 22px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #94a3b8;
-}
-
-.export-btn {
-    background: #10b981;
-    border: none;
-    padding: 10px 18px;
-    border-radius: 40px;
-    font-weight: 600;
-    color: white;
-    cursor: pointer;
-    margin-bottom: 12px;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    transition: 0.2s;
-}
-
-.export-btn:hover {
-    background: #059669;
-    transform: scale(0.98);
 }
 
 .drives-grid {
@@ -336,7 +255,6 @@ td {
     border: 1px solid #eef2ff;
     padding: 22px;
     transition: all 0.25s;
-    box-shadow: 0 6px 12px -8px rgba(0, 0, 0, 0.05);
 }
 
 .drive-card:hover {
@@ -365,7 +283,6 @@ td {
     font-weight: 700;
     cursor: pointer;
     margin-top: 14px;
-    transition: 0.2s;
 }
 
 .apply-btn:hover {
@@ -381,7 +298,6 @@ td {
     background: rgba(15, 23, 42, 0.65);
     backdrop-filter: blur(8px);
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
     z-index: 2000;
@@ -410,29 +326,33 @@ td {
     100% { transform: rotate(360deg); }
 }
 
-.loading-overlay p {
-    color: white;
-    font-weight: 600;
-    background: rgba(0,0,0,0.4);
-    padding: 6px 18px;
-    border-radius: 40px;
-}
-
-.form-row {
-    display: flex;
-    gap: 18px;
-    flex-wrap: wrap;
-}
-
-.form-row .form-group {
-    flex: 1;
-}
-
-.feedback-select {
-    padding: 8px 12px;
+.feedback-form-wrapper {
+    background: #f8fafc;
+    padding: 24px;
     border-radius: 28px;
+    margin-top: 20px;
+}
+
+.question-card {
+    background: white;
+    padding: 20px;
+    margin-bottom: 16px;
+    border-radius: 20px;
+    border: 1px solid #e2e8f0;
+}
+
+.question-card p {
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.rating-select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 12px;
     border: 1.5px solid #cbd5e1;
-    font-weight: 500;
+    background: white;
+    cursor: pointer;
 }
 
 .feedback-btn {
@@ -443,13 +363,44 @@ td {
     border-radius: 40px;
     cursor: pointer;
     font-weight: 600;
-    transition: all 0.2s ease;
-    min-width: 120px;
 }
 
-.feedback-btn:disabled {
-    opacity: 0.8;
-    cursor: not-allowed;
+.export-btn {
+    background: #10b981;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 40px;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    margin-bottom: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.search-container {
+    margin: 20px 0;
+    position: relative;
+}
+
+.search-container input {
+    width: 100%;
+    padding: 14px 18px 14px 48px;
+    border: 2px solid #e2e8f0;
+    border-radius: 48px;
+    font-size: 0.95rem;
+}
+
+.search-container::before {
+    content: "\f002";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    position: absolute;
+    left: 22px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
 }
 
 .status-badge {
@@ -459,13 +410,10 @@ td {
     font-size: 0.75rem;
     font-weight: 700;
     color: #1e40af;
+    display: inline-block;
 }
 
 @media (max-width: 700px) {
-    .container {
-        padding: 0 16px;
-    }
-    .view-panel {
-        padding: 20px;
-    }
+    .container { padding: 0 16px; }
+    .view-panel { padding: 20px; }
 }
