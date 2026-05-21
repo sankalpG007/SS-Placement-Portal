@@ -2,9 +2,7 @@
 // SS INFOTECH - PLACEMENT PROVIDER PORTAL
 // ============================
 
-const WEB_APP_URL =
-  "https://script.google.com/macros/s/AKfycbyNaXGlXLF_7QrYQyvF1b_7nI0u-dcx0crjFd4EUFT-CfzSauFLfQpCIU1zXG3vpOXmjw/exec";
-
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwJxWoDiTIvY66EGUs6PQbcJ5Z8V7bZrzsE6GSC_pYHsB2kGJOkgfbRSLGPmjz9qeQmMQ/exec";
 let loggedInCandidateName = "";
 let currentCandidateEmail = "";
 
@@ -199,37 +197,60 @@ document
   .getElementById("candidateRegisterForm")
   .addEventListener("submit", async function (e) {
     e.preventDefault();
-
-    showLoader("Registering Candidate...");
-
-    const payload = {
-      action: "registerCandidate",
-
-      name: document.getElementById("regName").value.trim(),
-
-      email: document.getElementById("regEmail").value.trim(),
-
-      password: document.getElementById("regPass").value,
-
-      phone: document.getElementById("regPhone").value.trim(),
-
-      skills: document.getElementById("regSkills").value.trim(),
+    const fileInput = document.getElementById("regResume").files[0];
+    
+    // Core payload setup including the 4 new data parameters
+    const payload = { 
+        action: "registerCandidate", 
+        name: document.getElementById("regName").value.trim(), 
+        email: document.getElementById("regEmail").value.trim(), 
+        password: document.getElementById("regPass").value, 
+        phone: document.getElementById("regPhone").value.trim(), 
+        skills: document.getElementById("regSkills").value.trim(),
+        college: document.getElementById("regCollege").value.trim(),
+        department: document.getElementById("regDept").value.trim(),
+        experience: document.getElementById("regExp").value,
+        relocate: document.getElementById("regRelocate").value
     };
-
-    const res = await apiRequest(payload);
-
-    hideLoader();
-
-    if (res.status === "success") {
-      alert("Registration Successful!");
-
-      e.target.reset();
-
-      toggleAuthMode();
+    
+    const sendData = (finalPayload) => {
+        const btn = e.target.querySelector('button');
+        setButtonLoading(btn);
+        showLoader("Registering...");
+        
+        fetch(WEB_APP_URL, { 
+            method: "POST", 
+            body: JSON.stringify(finalPayload) 
+        })
+        .then(res => res.json())
+        .then(res => { 
+            alert(res.status === "success" ? "Registration Successful" : res.message); 
+            if (res.status === "success") { 
+                e.target.reset(); 
+                toggleAuthMode(); 
+            } 
+        })
+        .catch(err => alert("Error communicating with servers."))
+        .finally(() => { 
+            hideLoader(); 
+            removeButtonLoading(btn, "Create Account"); 
+        });
+    };
+    
+    if (fileInput) {
+        const reader = new FileReader();
+        reader.onload = ev => { 
+            const base64 = ev.target.result.split(",")[1]; 
+            payload.resumeFile = base64; 
+            payload.resumeName = fileInput.name; 
+            payload.resumeType = fileInput.type; 
+            sendData(payload); 
+        };
+        reader.readAsDataURL(fileInput);
     } else {
-      alert(res.message || "Registration Failed");
+        sendData(payload);
     }
-  });
+});
 
 // ============================
 // FETCH ADMIN DATA
