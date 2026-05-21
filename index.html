@@ -40,14 +40,29 @@
             </form>
 
             <form id="candidateRegisterForm" style="display: none;">
-                <div class="form-group"><label>Full Name</label><input type="text" id="regName" required></div>
-                <div class="form-group"><label>Email Address</label><input type="email" id="regEmail" required></div>
-                <div class="form-group"><label>Password</label><input type="password" id="regPass" required></div>
-                <div class="form-group"><label>Phone Number</label><input type="text" id="regPhone" required></div>
-                <div class="form-group"><label>Core Skills</label><input type="text" id="regSkills" placeholder="e.g. Java, Python, SQL" required></div>
-                <div class="form-group"><label>Upload Resume (PDF/Docx)</label><input type="file" id="regResume" accept=".pdf,.docx"></div>
-                <button type="submit" class="submit-btn"><i class="fas fa-user-plus"></i> Create Account</button>
-            </form>
+    <div class="form-group"><label>Full Name</label><input type="text" id="regName" required></div>
+    <div class="form-group"><label>Email Address</label><input type="email" id="regEmail" required></div>
+    <div class="form-group"><label>Password</label><input type="password" id="regPass" required></div>
+    <div class="form-group"><label>Phone Number</label><input type="text" id="regPhone" required></div>
+    
+    <div class="form-group"><label>College Name</label><input type="text" id="regCollege" placeholder="e.g. Anjuman College" required></div>
+    
+    <div class="form-group"><label>Department Name</label><input type="text" id="regDept" placeholder="e.g. CSE, IT, Mechanical" required></div>
+    
+    <div class="form-group"><label>Years of Experience</label><input type="number" id="regExp" min="0" max="50" placeholder="0 for Fresher" required></div>
+    
+    <div class="form-group">
+        <label>Ready to Relocate?</label>
+        <select id="regRelocate" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
+            <option value="Yes">Yes, Ready to Relocate</option>
+            <option value="No">No, Prefer Local Positions</option>
+        </select>
+    </div>
+
+    <div class="form-group"><label>Core Skills</label><input type="text" id="regSkills" placeholder="e.g. Java, Python, SQL" required></div>
+    <div class="form-group"><label>Upload Resume (PDF/Docx)</label><input type="file" id="regResume" accept=".pdf,.docx"></div>
+    <button type="submit" class="submit-btn"><i class="fas fa-user-plus"></i> Create Account</button>
+</form>
             
             <hr>
             <p class="subtitle" id="toggleText">New candidate looking for jobs?</p>
