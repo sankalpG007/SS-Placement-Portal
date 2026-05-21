@@ -189,13 +189,61 @@ function fetchHRApplications() {
 }
 
 window.updateApplicationFeedback = function(rowId, candidateName, company, role) {
+
     const newStatus = document.getElementById(`statusSelect_${rowId}`).value;
-    const payload = { action:"updateApplicationStatus", candidateName, companyName:company, jobTitle:role, newStatus };
-    fetch(WEB_APP_URL, { method:"POST", body:JSON.stringify(payload) }).then(res=>res.json()).then(res=>{
-        if(res.status==="success") alert(`Feedback updated to ${newStatus} for ${candidateName}`);
-        else alert("Update failed");
-        fetchHRApplications(); // refresh
-    }).catch(err=>alert("Error updating feedback"));
+
+    // Get button
+    const btn = document.querySelector(
+        `#appRow_${rowId} .feedback-btn`
+    );
+
+    // Store original text
+    const originalText = btn.innerHTML;
+
+    // Loading state
+    btn.disabled = true;
+    btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Saving...`;
+
+    const payload = {
+        action: "updateApplicationStatus",
+        candidateName,
+        companyName: company,
+        jobTitle: role,
+        newStatus
+    };
+
+    fetch(WEB_APP_URL, {
+        method: "POST",
+        body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(res => {
+
+        if (res.status === "success") {
+
+            btn.innerHTML = `<i class="fas fa-check"></i> Saved`;
+
+            setTimeout(() => {
+                fetchHRApplications(); // refresh table
+            }, 700);
+
+        } else {
+
+            alert("Update failed");
+
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+
+    })
+    .catch(err => {
+
+        alert("Error updating feedback");
+
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+
+    });
 };
 
 // ============================

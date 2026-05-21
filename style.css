@@ -443,10 +443,13 @@ td {
     border-radius: 40px;
     cursor: pointer;
     font-weight: 600;
+    transition: all 0.2s ease;
+    min-width: 120px;
 }
 
-.feedback-btn:hover {
-    background: #2563eb;
+.feedback-btn:disabled {
+    opacity: 0.8;
+    cursor: not-allowed;
 }
 
 .status-badge {
