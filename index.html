@@ -1,266 +1,269 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SS Infotech | Placement Provider Portal</title>
-    <!-- CSS styles have been removed - link to your external style.css file -->
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- No internal CSS - all styles should be in your external style.css file -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SS Infotech | Placement Provider Portal</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 </head>
 <body>
 
+<!-- HEADER -->
 <header>
-    <div id="portalTitle"><i class="fas fa-briefcase"></i> SS Infotech · Placement Provider</div>
-    <button id="logoutBtn" class="logout-btn" onclick="logout()" style="display: none;"><i class="fas fa-sign-out-alt"></i> Exit</button>
+  <div id="portalTitle"><i class="fas fa-briefcase"></i> SS Infotech · Placement Provider</div>
+  <button id="logoutBtn" class="logout-btn" onclick="logout()" style="display:none;">
+    <i class="fas fa-sign-out-alt"></i> Exit
+  </button>
 </header>
 
+<!-- LOADING OVERLAY -->
 <div id="loadingOverlay" class="loading-overlay">
-    <div class="spinner"></div>
-    <p style="color: white; margin-top: 20px;">Synchronizing database • please wait...</p>
+  <div class="spinner"></div>
+  <p>Please wait...</p>
 </div>
 
 <div class="container">
-    <!-- LOGIN VIEW -->
-    <div id="loginView" class="view-panel active-view">
-        <div class="login-card">
-            <h2><i class="fas fa-shield-alt"></i> SS Infotech Portal</h2>
-            <p class="subtitle">Access for Admin • HR Partners • Candidates</p>
-            
-            <form id="loginForm">
-                <div class="form-group">
-                    <label><i class="far fa-envelope"></i> Email / Username</label>
-                    <input type="text" id="loginUser" placeholder="admin / hrpartner / candidate@email.com" required>
-                </div>
-                <div class="form-group">
-                    <label><i class="fas fa-lock"></i> Password</label>
-                    <input type="password" id="loginPass" placeholder="••••••••" required>
-                </div>
-                <button type="submit" class="login-submit-btn"><i class="fas fa-arrow-right-to-bracket"></i> Verify Credentials</button>
-            </form>
 
-            <form id="candidateRegisterForm" style="display: none;">
-    <div class="form-group"><label>Full Name</label><input type="text" id="regName" required></div>
-    <div class="form-group"><label>Email Address</label><input type="email" id="regEmail" required></div>
-    <div class="form-group"><label>Password</label><input type="password" id="regPass" required></div>
-    <div class="form-group"><label>Phone Number</label><input type="text" id="regPhone" required></div>
-    
-    <div class="form-group"><label>College Name</label><input type="text" id="regCollege" placeholder="e.g. Anjuman College" required></div>
-    
-    <div class="form-group"><label>Department Name</label><input type="text" id="regDept" placeholder="e.g. CSE, IT, Mechanical" required></div>
-    
-    <div class="form-group"><label>Years of Experience</label><input type="number" id="regExp" min="0" max="50" placeholder="0 for Fresher" required></div>
-    
-    <div class="form-group">
-        <label>Ready to Relocate?</label>
-        <select id="regRelocate" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
+  <!-- ======================================================
+       LOGIN VIEW
+  ====================================================== -->
+  <div id="loginView" class="view-panel active-view">
+    <div class="login-card">
+      <div class="login-icon"><i class="fas fa-shield-alt"></i></div>
+      <h2>SS Infotech Portal</h2>
+      <p class="subtitle">Access for Admin &bull; HR Partners &bull; Candidates</p>
+
+      <!-- LOGIN FORM -->
+      <form id="loginForm">
+        <div class="form-group">
+          <label><i class="far fa-envelope"></i> Email / Username</label>
+          <input type="text" id="loginUser" placeholder="admin / hrpartner / your@email.com" required />
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-lock"></i> Password</label>
+          <input type="password" id="loginPass" placeholder="••••••••" required />
+        </div>
+        <button type="submit" class="login-submit-btn">
+          <i class="fas fa-arrow-right-to-bracket"></i> Verify &amp; Login
+        </button>
+      </form>
+
+      <!-- REGISTER FORM (hidden by default) -->
+      <form id="candidateRegisterForm" style="display:none;">
+        <div class="form-group"><label>Full Name</label><input type="text" id="regName" placeholder="Your full name" required /></div>
+        <div class="form-group"><label>Email Address</label><input type="email" id="regEmail" placeholder="you@example.com" required /></div>
+        <div class="form-group"><label>Password</label><input type="password" id="regPass" placeholder="Create a strong password" required /></div>
+        <div class="form-group"><label>Phone Number</label><input type="text" id="regPhone" placeholder="+91 98765 43210" required /></div>
+        <div class="form-group"><label>College Name</label><input type="text" id="regCollege" placeholder="e.g. Anjuman College" required /></div>
+        <div class="form-group"><label>Department</label><input type="text" id="regDept" placeholder="e.g. CSE, IT, Mechanical" required /></div>
+        <div class="form-group"><label>Years of Experience</label><input type="number" id="regExp" min="0" max="50" placeholder="0 for Fresher" required /></div>
+        <div class="form-group">
+          <label>Ready to Relocate?</label>
+          <select id="regRelocate" required>
             <option value="Yes">Yes, Ready to Relocate</option>
             <option value="No">No, Prefer Local Positions</option>
-        </select>
+          </select>
+        </div>
+        <div class="form-group"><label>Core Skills</label><input type="text" id="regSkills" placeholder="e.g. Java, Python, SQL" required /></div>
+        <div class="form-group"><label>Upload Resume (PDF / DOCX)</label><input type="file" id="regResume" accept=".pdf,.docx" /></div>
+        <button type="submit" class="submit-btn"><i class="fas fa-user-plus"></i> Create Account</button>
+      </form>
+
+      <hr class="divider" />
+      <p class="subtitle" id="toggleText">New candidate looking for jobs?</p>
+      <button class="role-btn" id="toggleAuthBtn" onclick="toggleAuthMode()">
+        <i class="fas fa-exchange-alt"></i> Register as Candidate
+      </button>
+    </div>
+  </div>
+
+  <!-- ======================================================
+       ADMIN VIEW
+  ====================================================== -->
+  <div id="adminView" class="view-panel">
+
+    <div class="stats-grid">
+      <div class="stat-card blue-card">
+        <h3><i class="fas fa-users"></i> Registered Candidates</h3>
+        <p id="totalCandidatesCount">0</p>
+      </div>
+      <div class="stat-card green-card">
+        <h3><i class="fas fa-bullhorn"></i> Active Drives</h3>
+        <p id="totalDrivesCount">0</p>
+      </div>
+      <div class="stat-card purple-card">
+        <h3><i class="fas fa-star"></i> Avg Feedback Rating</h3>
+        <p id="avgRating">⭐ 0.0</p>
+      </div>
+      <div class="stat-card orange-card">
+        <h3><i class="fas fa-comment-dots"></i> Total Feedbacks</h3>
+        <p id="totalFeedbacks">0</p>
+      </div>
     </div>
 
-    <div class="form-group"><label>Core Skills</label><input type="text" id="regSkills" placeholder="e.g. Java, Python, SQL" required></div>
-    <div class="form-group"><label>Upload Resume (PDF/Docx)</label><input type="file" id="regResume" accept=".pdf,.docx"></div>
-    <button type="submit" class="submit-btn"><i class="fas fa-user-plus"></i> Create Account</button>
-</form>
-            
-            <hr>
-            <p class="subtitle" id="toggleText">New candidate looking for jobs?</p>
-            <button class="role-btn" id="toggleAuthBtn" onclick="toggleAuthMode()"><i class="fas fa-exchange-alt"></i> Register as Candidate</button>
-        </div>
+    <!-- Candidates -->
+    <div class="section-bar">
+      <h3><i class="fas fa-database"></i> Registered Candidates</h3>
+      <button class="export-btn" onclick="exportTableToExcel('candidateTableBody','Candidates')">
+        <i class="fas fa-file-csv"></i> Export
+      </button>
+    </div>
+    <div class="search-container">
+      <input type="text" id="adminCandidateSearch" placeholder="Search candidates..." />
+    </div>
+    <div class="table-container">
+      <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Skills</th><th>College</th><th>Dept</th><th>Exp</th><th>Relocate</th><th>Resume</th><th>Status</th></tr></thead>
+        <tbody id="candidateTableBody"><tr><td colspan="10" class="placeholder-text">Loading...</td></tr></tbody>
+      </table>
     </div>
 
-    <!-- ADMIN VIEW -->
-    <div id="adminView" class="view-panel">
-        <div class="stats-grid">
-            <div class="stat-card"><h3><i class="fas fa-users"></i> Registered Candidates</h3><p id="totalCandidatesCount">0</p></div>
-            <div class="stat-card"><h3><i class="fas fa-bullhorn"></i> Active Drives</h3><p id="totalDrivesCount">0</p></div>
-            <div class="stat-card"><h3><i class="fas fa-star"></i> Avg Feedback Rating</h3><p id="avgRating">0</p></div>
-            <div class="stat-card"><h3><i class="fas fa-comment-dots"></i> Total Feedbacks</h3><p id="totalFeedbacks">0</p></div>
-        </div>
-        
-        <h3><i class="fas fa-database"></i> Registered Candidates</h3>
-        <div class="search-container"><input type="text" id="adminCandidateSearch" placeholder="Search..."></div>
-        <button class="export-btn" onclick="exportTableToExcel('candidateTableBody', 'Registered_Candidates')"><i class="fas fa-file-excel"></i> Export</button>
-        <div class="table-container">
-            <table>
-                <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Skills</th><th>Resume</th></tr></thead>
-                <tbody id="candidateTableBody"><tr><td colspan="5" class="placeholder-text">Loading...</td></tr></tbody>
-            </table>
-        </div>
-        
-        <h3><i class="fas fa-paper-plane"></i> Applications & Drives</h3>
-        <div class="search-container"><input type="text" id="adminAppSearch" placeholder="Search..."></div>
-        <button class="export-btn" onclick="exportTableToExcel('adminApplicationsTableBody', 'All_Applications')"><i class="fas fa-file-excel"></i> Export</button>
-        <div class="table-container">
-            <table>
-                <thead><tr><th>Date</th><th>Candidate</th><th>Company</th><th>Role</th><th>Status</th></tr></thead>
-                <tbody id="adminApplicationsTableBody"><tr><td colspan="5" class="placeholder-text">Loading...</td></tr></tbody>
-            </table>
-        </div>
-        
-        <h3><i class="fas fa-comment-dots"></i> Candidate Feedback for SS Infotech</h3>
-        <div class="search-container"><input type="text" id="feedbackSearch" placeholder="Search..."></div>
-        <button class="export-btn" onclick="exportTableToExcel('feedbackTableBody', 'SS_Infotech_Feedback')"><i class="fas fa-file-excel"></i> Export Feedback</button>
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Date</th><th>Candidate Name</th><th>Email</th><th>Avg Rating</th>
-                        <th>Q1: Overall</th><th>Q2: Organization</th><th>Q3: Communication</th>
-                        <th>Q4: Interview</th><th>Q5: Updates</th><th>Q6: Support</th>
-                        <th>Q7: Transparency</th><th>Q8: Document</th><th>Q9: Post-Placement</th>
-                        <th>Q10: Recommend</th><th>Comments</th>
-                    </tr>
-                </thead>
-                <tbody id="feedbackTableBody"><tr><td colspan="15" class="placeholder-text">Loading feedback...</td></tr></tbody>
-            </table>
-        </div>
+    <!-- Applications -->
+    <div class="section-bar">
+      <h3><i class="fas fa-paper-plane"></i> All Applications</h3>
+      <button class="export-btn" onclick="exportTableToExcel('adminApplicationsTableBody','Applications')">
+        <i class="fas fa-file-csv"></i> Export
+      </button>
+    </div>
+    <div class="search-container">
+      <input type="text" id="adminAppSearch" placeholder="Search applications..." />
+    </div>
+    <div class="table-container">
+      <table>
+        <thead><tr><th>Date</th><th>Candidate</th><th>Company</th><th>Role</th><th>Status</th></tr></thead>
+        <tbody id="adminApplicationsTableBody"><tr><td colspan="5" class="placeholder-text">Loading...</td></tr></tbody>
+      </table>
     </div>
 
-    <!-- HR PARTNER VIEW -->
-    <div id="companyView" class="view-panel">
-        <div class="login-card" style="max-width: 800px;">
-            <h2><i class="fas fa-plus-circle"></i> Create Placement Drive</h2>
-            <form id="driveForm">
-                <div class="form-group"><label>Company Name</label><input type="text" id="compName" required></div>
-                <div class="form-group"><label>HR Recruiter</label><input type="text" id="hrName" required></div>
-                <div class="form-group"><label>Job Title Role</label><input type="text" id="jobTitle" required></div>
-                <div class="form-group"><label>Eligibility Criteria</label><input type="text" id="eligibility" required></div>
-                <div class="form-group"><label>Job Description</label><textarea id="jobDesc" rows="3"></textarea></div>
-                <button type="submit" class="submit-btn"><i class="fas fa-bullhorn"></i> Publish Drive</button>
-            </form>
-        </div>
-        
-        <h3><i class="fas fa-users"></i> Applications Received</h3>
-        <div class="search-container"><input type="text" id="hrAppSearch" placeholder="Filter..."></div>
-        <button class="export-btn" onclick="exportTableToExcel('hrApplicationsTableBody', 'HR_Applications')"><i class="fas fa-download"></i> Export</button>
-        <div class="table-container">
-            <table>
-                <thead><tr><th>Date</th><th>Candidate</th><th>Company</th><th>Role</th><th>Status</th><th>Update</th></tr></thead>
-                <tbody id="hrApplicationsTableBody"><tr><td colspan="6" class="placeholder-text">Loading...</td></tr></tbody>
-            </table>
-        </div>
+    <!-- Feedback -->
+    <div class="section-bar">
+      <h3><i class="fas fa-comment-dots"></i> Candidate Feedback</h3>
+      <button class="export-btn" onclick="exportTableToExcel('feedbackTableBody','Feedback')">
+        <i class="fas fa-file-csv"></i> Export
+      </button>
+    </div>
+    <div class="search-container">
+      <input type="text" id="feedbackSearch" placeholder="Search feedback..." />
+    </div>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th><th>Candidate</th><th>Email</th><th>Avg</th>
+            <th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th><th>Q5</th>
+            <th>Q6</th><th>Q7</th><th>Q8</th><th>Q9</th><th>Q10</th><th>Comments</th>
+          </tr>
+        </thead>
+        <tbody id="feedbackTableBody"><tr><td colspan="15" class="placeholder-text">Loading...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ======================================================
+       HR PARTNER VIEW (FIXED TABLE HEADERS)
+  ====================================================== -->
+  <div id="companyView" class="view-panel">
+
+    <div class="login-card" style="max-width:720px; margin-bottom:36px;">
+      <h2><i class="fas fa-plus-circle"></i> Create Placement Drive</h2>
+      <p class="subtitle">Fill in details to publish a new drive for candidates</p>
+      <form id="driveForm">
+        <div class="form-group"><label>Company Name</label><input type="text" id="compName" placeholder="e.g. TCS, Infosys" required /></div>
+        <div class="form-group"><label>HR Recruiter Name</label><input type="text" id="hrName" placeholder="Your name" required /></div>
+        <div class="form-group"><label>Job Title / Role</label><input type="text" id="jobTitle" placeholder="e.g. Software Engineer" required /></div>
+        <div class="form-group"><label>Eligibility Criteria</label><input type="text" id="eligibility" placeholder="e.g. B.E./B.Tech, 60%+" required /></div>
+        <div class="form-group"><label>Job Description</label><textarea id="jobDesc" rows="4" placeholder="Role, responsibilities, CTC, location..."></textarea></div>
+        <button type="submit" class="submit-btn"><i class="fas fa-bullhorn"></i> Publish Drive</button>
+      </form>
     </div>
 
-    <!-- CANDIDATE VIEW -->
-    <div id="candidateView" class="view-panel">
-        <h2><i class="fas fa-rocket"></i> Available Placement Drives</h2>
-        <div id="drivesGrid" class="drives-grid"><p class="placeholder-text">Fetching drives...</p></div>
-        
-        <hr style="margin: 40px 0;">
-        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 28px; color: white;">
-            <h2 style="color: white;"><i class="fas fa-comment-dots"></i> Share Your Feedback About SS Infotech</h2>
-            <p style="color: rgba(255,255,255,0.9);">Help us improve our placement services! Rate us on the following parameters (1-5, 5=Excellent)</p>
-        </div>
-        
-        <div class="feedback-form-wrapper">
-            <div class="question-card">
-                <p><strong>Q1.</strong> How would you rate your overall experience with SS Infotech placement services?</p>
-                <select id="q1" class="rating-select">
-                    <option value="0">Select Rating</option><option value="5">5 - Excellent</option>
-                    <option value="4">4 - Good</option><option value="3">3 - Average</option>
-                    <option value="2">2 - Poor</option><option value="1">1 - Very Poor</option>
-                </select>
-            </div>
-            <div class="question-card">
-                <p><strong>Q2.</strong> How well were the placement drives organized by SS Infotech?</p>
-                <select id="q2" class="rating-select">
-                    <option value="0">Select Rating</option><option value="5">5 - Excellent</option>
-                    <option value="4">4 - Good</option><option value="3">3 - Average</option>
-                    <option value="2">2 - Poor</option><option value="1">1 - Very Poor</option>
-                </select>
-            </div>
-            <div class="question-card">
-                <p><strong>Q3.</strong> How was the communication from SS Infotech team?</p>
-                <select id="q3" class="rating-select">
-                    <option value="0">Select Rating</option><option value="5">5 - Excellent</option>
-                    <option value="4">4 - Good</option><option value="3">3 - Average</option>
-                    <option value="2">2 - Poor</option><option value="1">1 - Very Poor</option>
-                </select>
-            </div>
-            <div class="question-card">
-                <p><strong>Q4.</strong> How would you rate the interview coordination process?</p>
-                <select id="q4" class="rating-select">
-                    <option value="0">Select Rating</option><option value="5">5 - Excellent</option>
-                    <option value="4">4 - Good</option><option value="3">3 - Average</option>
-                    <option value="2">2 - Poor</option><option value="1">1 - Very Poor</option>
-                </select>
-            </div>
-            <div class="question-card">
-                <p><strong>Q5.</strong> Were you updated timely about drive schedules and results?</p>
-                <select id="q5" class="rating-select">
-                    <option value="0">Select Rating</option><option value="5">5 - Always</option>
-                    <option value="4">4 - Most Times</option><option value="3">3 - Sometimes</option>
-                    <option value="2">2 - Rarely</option><option value="1">1 - Never</option>
-                </select>
-            </div>
-            <div class="question-card">
-                <p><strong>Q6.</strong> How supportive was the SS Infotech team throughout the process?</p>
-                <select id="q6" class="rating-select">
-                    <option value="0">Select Rating</option><option value="5">5 - Very Supportive</option>
-                    <option value="4">4 - Supportive</option><option value="3">3 - Neutral</option>
-                    <option value="2">2 - Unsupportive</option><option value="1">1 - Very Unsupportive</option>
-                </select>
-            </div>
-            <div class="question-card">
-                <p><strong>Q7.</strong> How transparent was the selection process?</p>
-                <select id="q7" class="rating-select">
-                    <option value="0">Select Rating</option><option value="5">5 - Completely Transparent</option>
-                    <option value="4">4 - Mostly Transparent</option>
-                    <option value="3">3 - Somewhat Transparent</option>
-                    <option value="2">2 - Not Transparent</option>
-                    <option value="1">1 - Hidden Process</option>
-                </select>
-            </div>
-            <div class="question-card">
-                <p><strong>Q8.</strong> How would you rate the document submission and verification process?</p>
-                <select id="q8" class="rating-select">
-                    <option value="0">Select Rating</option><option value="5">5 - Very Smooth</option>
-                    <option value="4">4 - Smooth</option>
-                    <option value="3">3 - Average</option>
-                    <option value="2">2 - Difficult</option>
-                    <option value="1">1 - Very Difficult</option>
-                </select>
-            </div>
-            <div class="question-card">
-                <p><strong>Q9.</strong> How would you rate the post-placement support from SS Infotech?</p>
-                <select id="q9" class="rating-select">
-                    <option value="0">Select Rating</option><option value="5">5 - Excellent</option>
-                    <option value="4">4 - Good</option><option value="3">3 - Average</option>
-                    <option value="2">2 - Poor</option><option value="1">1 - Very Poor</option>
-                </select>
-            </div>
-            <div class="question-card">
-                <p><strong>Q10.</strong> How likely are you to recommend SS Infotech to other job seekers?</p>
-                <select id="q10" class="rating-select">
-                    <option value="0">Select Rating</option><option value="5">5 - Definitely</option>
-                    <option value="4">4 - Likely</option>
-                    <option value="3">3 - Maybe</option>
-                    <option value="2">2 - Unlikely</option>
-                    <option value="1">1 - Never</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label>Additional Comments / Suggestions for SS Infotech</label>
-                <textarea id="additionalComments" rows="3" placeholder="Please share any suggestions to help us improve..."></textarea>
-            </div>
-            <button class="submit-btn" onclick="submitFeedbackToSSInfotech()"><i class="fas fa-paper-plane"></i> Submit Feedback to SS Infotech</button>
-        </div>
+    <div class="section-bar">
+      <h3><i class="fas fa-users"></i> Applications Received</h3>
+      <button class="export-btn" onclick="exportTableToExcel('hrApplicationsTableBody','HR_Applications')">
+        <i class="fas fa-file-csv"></i> Export
+      </button>
     </div>
-</div>
+    <div class="search-container">
+      <input type="text" id="hrAppSearch" placeholder="Filter applications..." />
+    </div>
+    <div class="table-container">
+      <table>
+        <thead>
+          <!-- FIX: Added <th>Email</th> and updated colspan to 7 -->
+          <tr><th>Date</th><th>Candidate</th><th>Email</th><th>Company</th><th>Role</th><th>Update Status</th><th>Save</th></tr>
+        </thead>
+        <tbody id="hrApplicationsTableBody">
+          <tr><td colspan="7" class="placeholder-text">Loading applications...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 
-<script>
-    // Placeholder functions for the buttons - your actual app.js should handle these
-    function logout() { console.log("logout triggered"); }
-    function toggleAuthMode() { console.log("toggle auth mode"); }
-    function exportTableToExcel(tableId, filename) { console.log("export", tableId, filename); }
-    function submitFeedbackToSSInfotech() { console.log("feedback submitted"); }
-    console.log("CSS has been removed — using external style.css");
-</script>
+  <!-- ======================================================
+       CANDIDATE VIEW
+  ====================================================== -->
+  <div id="candidateView" class="view-panel">
+
+    <h2 class="section-title"><i class="fas fa-rocket"></i> Available Placement Drives</h2>
+    <div id="drivesGrid" class="drives-grid">
+      <p class="placeholder-text">Fetching drives...</p>
+    </div>
+
+    <hr class="big-divider" />
+
+    <div class="feedback-banner">
+      <h2><i class="fas fa-comment-dots"></i> Share Your Feedback About SS Infotech</h2>
+      <p>Help us improve! Rate us on the following parameters (5 = Excellent, 1 = Very Poor)</p>
+    </div>
+
+    <div class="feedback-form-wrapper">
+
+      <div class="question-card"><p><strong>Q1.</strong> Overall experience with SS Infotech placement services?</p>
+        <select id="q1" class="rating-select"><option value="0">Select Rating</option><option value="5">5 - Excellent</option><option value="4">4 - Good</option><option value="3">3 - Average</option><option value="2">2 - Poor</option><option value="1">1 - Very Poor</option></select></div>
+
+      <div class="question-card"><p><strong>Q2.</strong> How well were the placement drives organized?</p>
+        <select id="q2" class="rating-select"><option value="0">Select Rating</option><option value="5">5 - Excellent</option><option value="4">4 - Good</option><option value="3">3 - Average</option><option value="2">2 - Poor</option><option value="1">1 - Very Poor</option></select></div>
+
+      <div class="question-card"><p><strong>Q3.</strong> Communication from SS Infotech team?</p>
+        <select id="q3" class="rating-select"><option value="0">Select Rating</option><option value="5">5 - Excellent</option><option value="4">4 - Good</option><option value="3">3 - Average</option><option value="2">2 - Poor</option><option value="1">1 - Very Poor</option></select></div>
+
+      <div class="question-card"><p><strong>Q4.</strong> Interview coordination process?</p>
+        <select id="q4" class="rating-select"><option value="0">Select Rating</option><option value="5">5 - Excellent</option><option value="4">4 - Good</option><option value="3">3 - Average</option><option value="2">2 - Poor</option><option value="1">1 - Very Poor</option></select></div>
+
+      <div class="question-card"><p><strong>Q5.</strong> Were you updated timely about drive schedules and results?</p>
+        <select id="q5" class="rating-select"><option value="0">Select Rating</option><option value="5">5 - Always</option><option value="4">4 - Most Times</option><option value="3">3 - Sometimes</option><option value="2">2 - Rarely</option><option value="1">1 - Never</option></select></div>
+
+      <div class="question-card"><p><strong>Q6.</strong> How supportive was the SS Infotech team?</p>
+        <select id="q6" class="rating-select"><option value="0">Select Rating</option><option value="5">5 - Very Supportive</option><option value="4">4 - Supportive</option><option value="3">3 - Neutral</option><option value="2">2 - Unsupportive</option><option value="1">1 - Very Unsupportive</option></select></div>
+
+      <div class="question-card"><p><strong>Q7.</strong> Transparency of the selection process?</p>
+        <select id="q7" class="rating-select"><option value="0">Select Rating</option><option value="5">5 - Completely Transparent</option><option value="4">4 - Mostly Transparent</option><option value="3">3 - Somewhat</option><option value="2">2 - Not Transparent</option><option value="1">1 - Hidden</option></select></div>
+
+      <div class="question-card"><p><strong>Q8.</strong> Document submission and verification process?</p>
+        <select id="q8" class="rating-select"><option value="0">Select Rating</option><option value="5">5 - Very Smooth</option><option value="4">4 - Smooth</option><option value="3">3 - Average</option><option value="2">2 - Difficult</option><option value="1">1 - Very Difficult</option></select></div>
+
+      <div class="question-card"><p><strong>Q9.</strong> Post-placement support from SS Infotech?</p>
+        <select id="q9" class="rating-select"><option value="0">Select Rating</option><option value="5">5 - Excellent</option><option value="4">4 - Good</option><option value="3">3 - Average</option><option value="2">2 - Poor</option><option value="1">1 - Very Poor</option></select></div>
+
+      <div class="question-card"><p><strong>Q10.</strong> How likely are you to recommend SS Infotech to others?</p>
+        <select id="q10" class="rating-select"><option value="0">Select Rating</option><option value="5">5 - Definitely</option><option value="4">4 - Likely</option><option value="3">3 - Maybe</option><option value="2">2 - Unlikely</option><option value="1">1 - Never</option></select></div>
+
+      <div class="form-group" style="margin-top:20px;">
+        <label>Additional Comments / Suggestions</label>
+        <textarea id="additionalComments" rows="4" placeholder="Share any suggestions to help us improve..."></textarea>
+      </div>
+
+      <button class="submit-btn feedback-submit-btn" onclick="submitFeedbackToSSInfotech()">
+        <i class="fas fa-paper-plane"></i> Submit Feedback to SS Infotech
+      </button>
+    </div>
+
+  </div><!-- end candidateView -->
+
+</div><!-- end .container -->
+
 <script src="app.js"></script>
 </body>
 </html>
