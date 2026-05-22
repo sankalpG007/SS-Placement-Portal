@@ -476,28 +476,70 @@ async function fetchActiveDrives() {
 }
 
 // Apply to a Drive
+// =================================================================
+// APPLY TO A DRIVE (WITH 3-COMPANY MAX LIMIT VALIDATION)
+// =================================================================
 window.applyToDrive = async function(company, jobTitle) {
-  if (!loggedInCandidateName) {
-    alert("Session expired. Please login again.");
+  if (!loggedInCandidateName || !currentCandidateEmail) {
+    alert("Session expired or invalid. Please login again.");
     logout();
     return;
   }
   
-  showLoader("Submitting Application...");
-  const res = await apiRequest({
-    action: "submitApplication",
-    candidateName: loggedInCandidateName,
-    candidateEmail: currentCandidateEmail,
-    companyName: company,
-    jobTitle: jobTitle
-  });
-  
-  hideLoader();
-  
-  if (res.status === "success") {
-    alert("✅ Application Submitted Successfully!");
-  } else {
-    alert("ℹ️ " + (res.message || "Could not submit application"));
+  showLoader("Checking application threshold limits...");
+
+  try {
+    // 1. Fetch all applications from the centralized backend stream
+    const verificationCheck = await apiRequest({ action: "getApplications" });
+    
+    if (verificationCheck.status === "success") {
+      // Filter out application records belonging strictly to this user's email
+      const myActiveApplications = verificationCheck.data.filter(app => 
+        String(app.candidate_email).toLowerCase().trim() === String(currentCandidateEmail).toLowerCase().trim()
+      );
+
+      // Check if they already applied to this exact company role to prevent duplicates
+      const isAlreadyApplied = myActiveApplications.some(app => 
+        String(app.company_name).toLowerCase().trim() === String(company).toLowerCase().trim() &&
+        String(app.job_title).toLowerCase().trim() === String(jobTitle).toLowerCase().trim()
+      );
+
+      if (isAlreadyApplied) {
+        hideLoader();
+        alert(`ℹ️ You have already submitted an active application profile for the ${jobTitle} role at ${company}.`);
+        return;
+      }
+
+      // 2. ENFORCE VALIDATION CRITERIA: Check threshold
+      if (myActiveApplications.length >= 3) {
+        hideLoader();
+        alert(`❌ Threshold Limit Reached: You are registered for ${myActiveApplications.length} companies. Candidates are restricted to a maximum of 3 placement drive choices.`);
+        return;
+      }
+    }
+
+    // 3. Process transmission to database sheet if validation checks pass smoothly
+    showLoader("Submitting Application Profile...");
+    const res = await apiRequest({
+      action: "submitApplication",
+      candidateName: loggedInCandidateName,
+      candidateEmail: currentCandidateEmail,
+      companyName: company,
+      jobTitle: jobTitle
+    });
+    
+    hideLoader();
+    
+    if (res.status === "success") {
+      alert(`✅ Application Submitted Successfully for ${jobTitle} at ${company}!`);
+    } else {
+      alert("ℹ️ " + (res.message || "Could not submit application"));
+    }
+
+  } catch (err) {
+    console.error("Pipeline failure during limit check:", err);
+    hideLoader();
+    alert("Network pipeline connection timeout error.");
   }
 };
 
