@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SS Infotech | Placement Provider Portal</title>
+  <title>SS Infotech</title>
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
@@ -12,7 +12,7 @@
 
 <!-- HEADER -->
 <header>
-  <div id="portalTitle"><i class="fas fa-briefcase"></i> SS Infotech · Placement Provider</div>
+  <div id="portalTitle"> SS Infotech | Career Opportunities Portal</div>
   <button id="logoutBtn" class="logout-btn" onclick="logout()" style="display:none;">
     <i class="fas fa-sign-out-alt"></i> Exit
   </button>
@@ -31,9 +31,8 @@
   ====================================================== -->
   <div id="loginView" class="view-panel active-view">
     <div class="login-card">
-      <div class="login-icon"><i class="fas fa-shield-alt"></i></div>
-      <h2>SS Infotech Portal</h2>
-      <p class="subtitle">Access for Admin &bull; HR Partners &bull; Candidates</p>
+        
+      <img src="./logo.png" alt="SS Infotech Logo" class="company-logo" />    
 
       <!-- LOGIN FORM -->
       <form id="loginForm">
@@ -262,7 +261,45 @@
 
   </div><!-- end candidateView -->
 
+
 </div><!-- end .container -->
+  <!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-container">
+
+    <div class="footer-section">
+      <img src="./logo.png" alt="SS Infotech Logo" class="footer-logo" />
+      <p>
+        Empowering students and professionals with career opportunities,
+        placement drives, and recruitment solutions.
+      </p>
+    </div>
+
+    <div class="footer-section">
+      <h3>Quick Links</h3>
+      <ul>
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Placement Drives</a></li>
+        <li><a href="#">Candidate Portal</a></li>
+        <li><a href="#">HR Partner</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-section">
+      <h3>Contact Us</h3>
+      <p><i class="fas fa-envelope"></i> hr@ssinfotech.co</p>
+      <p><i class="fas fa-phone"></i> +91 7720846048</p>
+       <p><i class="fas fa-phone"></i> +91 9399345989</p>
+      <p><i class="fas fa-location-dot"></i> Nagpur, Maharashtra, India</p>
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+    <p>© 2026 SS Infotech. All Rights Reserved.</p>
+  </div>
+</footer>
+
 
 <script src="app.js"></script>
 </body>
