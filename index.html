@@ -10,12 +10,42 @@
 </head>
 <body>
 
-<!-- HEADER -->
-<header>
-  <div id="portalTitle"> SS Infotech | Career Opportunities Portal</div>
-  <button id="logoutBtn" class="logout-btn" onclick="logout()" style="display:none;">
-    <i class="fas fa-sign-out-alt"></i> Exit
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
+<header class="main-header">
+
+  <div class="header-left">
+
+    <img 
+      src="./whitelogo.png" 
+      alt="SS Infotech Logo" 
+      class="header-logo"
+    />
+
+    <div class="header-text">
+      <h3 id="portalTitle">
+        SS Infotech
+      </h3>
+
+      <span class="portal-subtitle">
+        Career Opportunities Portal
+      </span>
+    </div>
+
+  </div>
+
+  <button 
+    id="logoutBtn" 
+    class="logout-btn" 
+    onclick="logout()" 
+    style="display:none;"
+  >
+    <i class="fas fa-sign-out-alt"></i>
+    Exit
   </button>
+
 </header>
 
 <!-- LOADING OVERLAY -->

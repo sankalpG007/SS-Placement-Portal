@@ -15,43 +15,182 @@ body {
 }
 
 /* ---- HEADER ---- */
-header {
-  background: linear-gradient(135deg, #0b2b44 0%, #123e6a 100%);
-  padding: 18px 32px;
+/* ==================================================
+   MODERN HEADER
+================================================== */
+
+.main-header{
+  width: 100%;
+  background: linear-gradient(
+    135deg,
+    #0f172a 0%,
+    #111827 50%,
+    #1e293b 100%
+  );
+
+  padding: 16px 40px;
+
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 12px 24px -12px rgba(0,0,0,0.3);
+
   position: sticky;
   top: 0;
-  z-index: 110;
+  z-index: 999;
+
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.25);
 }
-#portalTitle {
+
+/* LEFT SECTION */
+
+.header-left{
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+/* LOGO */
+
+.header-logo{
+  width: 120px;
+  height: auto;
+  object-fit: contain;
+
+  filter:
+    drop-shadow(0 4px 10px rgba(255,255,255,0.08));
+
+  transition: 0.3s ease;
+}
+
+.header-logo:hover{
+  transform: scale(1.04);
+}
+
+/* TEXT */
+
+.header-text{
+  display: flex;
+  flex-direction: column;
+}
+
+#portalTitle{
+  margin: 0;
+
+  font-size: 1.7rem;
   font-weight: 800;
-  font-size: 1.5rem;
-  background: linear-gradient(130deg, #fff, #b9dcff);
+  letter-spacing: 0.5px;
+
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #dbeafe 40%,
+    #93c5fd 100%
+  );
+
   -webkit-background-clip: text;
   background-clip: text;
+
   color: transparent;
+}
+
+/* SUBTITLE */
+
+.portal-subtitle{
+  margin-top: 4px;
+
+  color: rgba(255,255,255,0.72);
+
+  font-size: 0.88rem;
+  font-weight: 500;
+
+  letter-spacing: 0.5px;
+}
+
+/* LOGOUT BUTTON */
+
+.logout-btn{
+  border: none;
+  outline: none;
+
+  padding: 12px 24px;
+
+  border-radius: 999px;
+
+  background: linear-gradient(
+    135deg,
+    #ef4444 0%,
+    #dc2626 100%
+  );
+
+  color: white;
+
+  font-size: 0.9rem;
+  font-weight: 700;
+
   display: flex;
   align-items: center;
   gap: 10px;
-}
-.logout-btn {
-  background: rgba(220,38,38,0.9);
-  border: none;
-  padding: 8px 22px;
-  border-radius: 60px;
-  font-weight: 600;
-  font-size: 0.85rem;
-  color: white;
+
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.2s;
+
+  transition: all 0.25s ease;
+
+  box-shadow:
+    0 8px 18px rgba(239,68,68,0.25);
 }
-.logout-btn:hover { background: #b91c1c; transform: scale(0.97); }
+
+.logout-btn:hover{
+  transform: translateY(-2px);
+
+  background: linear-gradient(
+    135deg,
+    #dc2626 0%,
+    #b91c1c 100%
+  );
+
+  box-shadow:
+    0 14px 28px rgba(239,68,68,0.35);
+}
+
+.logout-btn:active{
+  transform: scale(0.97);
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+  .main-header{
+    padding: 14px 18px;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .header-left{
+    gap: 12px;
+  }
+
+  .header-logo{
+    width: 55px;
+  }
+
+  #portalTitle{
+    font-size: 1.2rem;
+  }
+
+  .portal-subtitle{
+    font-size: 0.75rem;
+  }
+
+  .logout-btn{
+    width: 100%;
+    justify-content: center;
+  }
+
+}
 
 /* ---- LOADING OVERLAY ---- */
 .loading-overlay {
