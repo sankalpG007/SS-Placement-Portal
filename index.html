@@ -10,12 +10,42 @@
 </head>
 <body>
 
-<!-- HEADER -->
-<header>
-  <div id="portalTitle"> SS Infotech | Career Opportunities Portal</div>
-  <button id="logoutBtn" class="logout-btn" onclick="logout()" style="display:none;">
-    <i class="fas fa-sign-out-alt"></i> Exit
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
+<header class="main-header">
+
+  <div class="header-left">
+
+    <img 
+      src="./whitelogo.png" 
+      alt="SS Infotech Logo" 
+      class="header-logo"
+    />
+
+    <div class="header-text">
+      <h3 id="portalTitle">
+        SS Infotech
+      </h3>
+
+      <span class="portal-subtitle">
+        Career Opportunities Portal
+      </span>
+    </div>
+
+  </div>
+
+  <button 
+    id="logoutBtn" 
+    class="logout-btn" 
+    onclick="logout()" 
+    style="display:none;"
+  >
+    <i class="fas fa-sign-out-alt"></i>
+    Exit
   </button>
+
 </header>
 
 <!-- LOADING OVERLAY -->
@@ -211,6 +241,56 @@
     </div>
 
     <hr class="big-divider" />
+<!-- =====================================================
+     SELECTED CANDIDATES SECTION
+===================================================== -->
+
+<div class="selected-section">
+
+  <div class="selected-header">
+    <h2>
+      <i class="fas fa-trophy"></i>
+      Recently Selected Candidates
+    </h2>
+
+    <p>
+      Congratulations to candidates who successfully got selected through SS Infotech placement drives.
+    </p>
+  </div>
+
+  <div class="table-wrapper">
+
+    <table class="selected-table">
+
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Candidate</th>
+          <th>Role</th>
+          <th>Company</th>
+          <th>Email</th>
+          <th>Date</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+
+      <tbody id="selectedCandidatesTableBody">
+
+        <tr>
+          <td colspan="7" class="loading-row">
+            Loading selected candidates...
+          </td>
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
+
+<hr class="big-divider" />
 
     <div class="feedback-banner">
       <h2><i class="fas fa-comment-dots"></i> Share Your Feedback About SS Infotech</h2>
