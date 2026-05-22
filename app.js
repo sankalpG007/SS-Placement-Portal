@@ -92,6 +92,7 @@ function switchView(viewId, titleText) {
     fetchHRApplications();
   } else if (viewId === "candidateView") {
     fetchActiveDrives();
+     fetchSelectedCandidates();
   }
 }
 
@@ -610,6 +611,153 @@ document.getElementById("hrAppSearch")?.addEventListener("input", function() {
 document.getElementById("feedbackSearch")?.addEventListener("input", function() {
   filterTable("feedbackTableBody", this.value);
 });
+
+// ======================================================
+// FETCH SELECTED CANDIDATES TABLE
+// ======================================================
+
+async function fetchSelectedCandidates() {
+
+  const tableBody = document.getElementById("selectedCandidatesTableBody");
+
+  if (!tableBody) return;
+
+  tableBody.innerHTML = `
+    <tr>
+      <td colspan="7" class="loading-row">
+        Loading selected candidates...
+      </td>
+    </tr>
+  `;
+
+  try {
+
+    const res = await apiRequest({
+      action: "getApplications"
+    });
+
+    // SUCCESS
+    if (res.status === "success") {
+
+      // FILTER ONLY SELECTED
+      const selectedCandidates = res.data.filter(app =>
+        (app.application_status || "").toLowerCase() === "selected"
+      );
+
+      // NO DATA
+      if (selectedCandidates.length === 0) {
+
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="7" class="loading-row">
+              No selected candidates yet.
+            </td>
+          </tr>
+        `;
+
+        return;
+      }
+
+      let html = "";
+
+      selectedCandidates.reverse().forEach((app, index) => {
+
+        // GET INITIALS
+        const initials = (app.candidate_name || "C")
+          .split(" ")
+          .map(word => word[0])
+          .join("")
+          .substring(0, 2)
+          .toUpperCase();
+
+        html += `
+          <tr>
+
+            <td>
+              ${index + 1}
+            </td>
+
+            <td>
+              <div class="candidate-info">
+
+                <div class="candidate-avatar">
+                  ${initials}
+                </div>
+
+                <div class="candidate-name">
+                  ${app.candidate_name || "Candidate"}
+                </div>
+
+              </div>
+            </td>
+
+            <td>
+              <span class="role-badge">
+                ${app.job_title || "Role"}
+              </span>
+            </td>
+
+            <td>
+              <span class="company-badge">
+                <i class="fas fa-building"></i>
+                ${app.company_name || "Company"}
+              </span>
+            </td>
+
+            <td>
+              <i class="fas fa-envelope"></i>
+              ${app.candidate_email || "-"}
+            </td>
+
+            <td>
+              <i class="fas fa-calendar"></i>
+              ${app.timestamp || "-"}
+            </td>
+
+            <td>
+              <span class="status-badge">
+                <i class="fas fa-circle-check"></i>
+                Selected
+              </span>
+            </td>
+
+          </tr>
+        `;
+
+      });
+
+      tableBody.innerHTML = html;
+
+    } else {
+
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="7" class="loading-row">
+            Failed to load selected candidates.
+          </td>
+        </tr>
+      `;
+
+    }
+
+  } catch (error) {
+
+    console.error(error);
+
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="7" class="loading-row">
+          Something went wrong while fetching data.
+        </td>
+      </tr>
+    `;
+
+  }
+
+}
+
+// CALL FUNCTION
+fetchSelectedCandidates();
 
 // ================= INITIALIZATION =================
 window.onload = () => {
