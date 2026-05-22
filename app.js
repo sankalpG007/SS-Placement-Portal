@@ -1,13 +1,17 @@
 // ======================================================
-// SS INFOTECH - PLACEMENT PORTAL (FULLY CORRECTED)
+// SS INFOTECH - CLIENT SIDE LOGIC (FULL app.js)
 // ======================================================
 
+// ================= CONFIGURATION =================
+// REPLACE THE URL BELOW WITH YOUR GOOGLE APPS SCRIPT WEB APP URL
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwJxWoDiTIvY66EGUs6PQbcJ5Z8V7bZrzsE6GSC_pYHsB2kGJOkgfbRSLGPmjz9qeQmMQ/exec";
 
+// ================= STATE VARIABLES =================
 let loggedInCandidateName = "";
 let currentCandidateEmail = "";
 
-// ==================== API REQUEST (NO CORS PREFLIGHT) ====================
+// ================= API HELPER =================
+// Handles fetch requests to Google Apps Script
 async function apiRequest(payload) {
   try {
     const response = await fetch(WEB_APP_URL, {
@@ -15,7 +19,7 @@ async function apiRequest(payload) {
       body: JSON.stringify(payload),
     });
     const result = await response.json();
-    console.log("API Response:", result);
+    console.log("API Response:", result); // For debugging in Browser Console (F12)
     return result;
   } catch (error) {
     console.error("API ERROR:", error);
@@ -23,7 +27,7 @@ async function apiRequest(payload) {
   }
 }
 
-// ==================== LOADER FUNCTIONS ====================
+// ================= UI HELPERS =================
 function showLoader(msg) {
   const overlay = document.getElementById("loadingOverlay");
   if (overlay) {
@@ -42,20 +46,59 @@ function hideLoader() {
 function setButtonLoading(btn, text) {
   if (btn) {
     btn.disabled = true;
+    const originalText = btn.innerHTML;
+    btn.setAttribute("data-original", originalText);
     btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${text}`;
   }
 }
 
-function resetButton(btn, originalHtml) {
+function resetButton(btn) {
   if (btn) {
     btn.disabled = false;
-    if (originalHtml) btn.innerHTML = originalHtml;
+    const originalText = btn.getAttribute("data-original");
+    if (originalText) btn.innerHTML = originalText;
   }
 }
 
-// ==================== AUTH TOGGLE ====================
-let isRegisterMode = false;
+// ================= VIEW MANAGEMENT =================
+function switchView(viewId, titleText) {
+  // Hide all views
+  document.querySelectorAll(".view-panel").forEach(panel => {
+    panel.classList.remove("active-view");
+  });
 
+  // Show requested view
+  const activeView = document.getElementById(viewId);
+  if (activeView) {
+    activeView.classList.add("active-view");
+  }
+
+  // Update Header Title
+  if (document.getElementById("portalTitle")) {
+    document.getElementById("portalTitle").innerHTML = `<i class="fas fa-briefcase"></i> SS Infotech · ${titleText}`;
+  }
+
+  // Toggle Logout Button
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn) {
+    logoutBtn.style.display = viewId === "loginView" ? "none" : "block";
+  }
+
+  // Trigger Data Loading based on view
+  if (viewId === "adminView") {
+    fetchAdminData();
+    fetchFeedbackData();
+  } else if (viewId === "companyView") {
+    fetchHRApplications();
+  } else if (viewId === "candidateView") {
+    fetchActiveDrives();
+  }
+}
+
+// ================= AUTH LOGIC =================
+
+// Toggle between Login and Register forms
+let isRegisterMode = false;
 function toggleAuthMode() {
   isRegisterMode = !isRegisterMode;
   const loginForm = document.getElementById("loginForm");
@@ -76,55 +119,29 @@ function toggleAuthMode() {
   }
 }
 
-// ==================== SWITCH VIEW ====================
-function switchView(viewId, titleText) {
-  document.querySelectorAll(".view-panel").forEach(panel => {
-    panel.classList.remove("active-view");
-  });
-  document.getElementById(viewId).classList.add("active-view");
-  document.getElementById("portalTitle").innerHTML = `<i class="fas fa-briefcase"></i> SS Infotech · ${titleText}`;
-  document.getElementById("logoutBtn").style.display = viewId === "loginView" ? "none" : "block";
-
-  if (viewId === "adminView") {
-    fetchAdminData();
-    fetchFeedbackData();
-  }
-  if (viewId === "companyView") {
-    fetchHRApplications();
-  }
-  if (viewId === "candidateView") {
-    fetchActiveDrives();
-  }
-}
-
-// ==================== LOGOUT ====================
-function logout() {
-  loggedInCandidateName = "";
-  currentCandidateEmail = "";
-  localStorage.clear();
-  switchView("loginView", "Placement Provider");
-}
-
-// ==================== LOGIN HANDLER ====================
+// Handle Login
 document.getElementById("loginForm").addEventListener("submit", async function(e) {
   e.preventDefault();
   const user = document.getElementById("loginUser").value.trim();
   const pass = document.getElementById("loginPass").value;
 
+  // 1. Hardcoded Admin Check
   if (user === "admin" && pass === "admin123") {
     localStorage.setItem("userRole", "admin");
     switchView("adminView", "Admin Dashboard");
     return;
   }
 
+  // 2. Hardcoded HR Check
   if (user === "hrpartner" && pass === "hr123") {
     localStorage.setItem("userRole", "hr");
     switchView("companyView", "HR Partner Workspace");
     return;
   }
 
+  // 3. Candidate Login (Backend)
   const btn = e.target.querySelector("button");
-  setButtonLoading(btn, "Logging in...");
+  setButtonLoading(btn, "Verifying...");
   showLoader("Verifying credentials...");
 
   const res = await apiRequest({
@@ -134,7 +151,7 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
   });
 
   hideLoader();
-  resetButton(btn, '<i class="fas fa-arrow-right-to-bracket"></i> Verify Credentials');
+  resetButton(btn);
 
   if (res.status === "success") {
     loggedInCandidateName = res.candidateName;
@@ -144,14 +161,14 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
     localStorage.setItem("candidateEmail", currentCandidateEmail);
     switchView("candidateView", `Welcome ${loggedInCandidateName}`);
   } else {
-    alert(res.message || "Invalid Credentials");
+    alert("Login Failed: " + (res.message || "Invalid credentials"));
   }
 });
 
-// ==================== REGISTRATION HANDLER ====================
+// Handle Registration
 document.getElementById("candidateRegisterForm").addEventListener("submit", async function(e) {
   e.preventDefault();
-  
+
   const payload = {
     action: "registerCandidate",
     name: document.getElementById("regName").value.trim(),
@@ -171,24 +188,30 @@ document.getElementById("candidateRegisterForm").addEventListener("submit", asyn
     showLoader("Registering...");
 
     const res = await apiRequest(finalPayload);
-    
+
     hideLoader();
-    resetButton(btn, '<i class="fas fa-user-plus"></i> Create Account');
+    resetButton(btn);
 
     if (res.status === "success") {
-      alert("Registration Successful! Please login.");
+      alert("✅ Registration Successful! Please login.");
       e.target.reset();
       toggleAuthMode();
     } else {
-      alert(res.message || "Registration failed");
+      alert("❌ Registration Failed: " + (res.message || "Unknown error"));
     }
   };
 
+  // Handle File Upload (Base64 conversion)
   const fileInput = document.getElementById("regResume").files[0];
   if (fileInput) {
+    // Check file size (limit to 5MB for Google Sheets safety)
+    if (fileInput.size > 5 * 1024 * 1024) {
+      alert("File is too large. Please upload a file smaller than 5MB.");
+      return;
+    }
     const reader = new FileReader();
     reader.onload = (ev) => {
-      payload.resumeFile = ev.target.result.split(",")[1];
+      payload.resumeFile = ev.target.result.split(",")[1]; // Get Base64 data
       payload.resumeName = fileInput.name;
       payload.resumeType = fileInput.type;
       sendRegistration(payload);
@@ -199,14 +222,21 @@ document.getElementById("candidateRegisterForm").addEventListener("submit", asyn
   }
 });
 
-// ==================== FETCH ADMIN DATA ====================
-async function fetchAdminData() {
-  showLoader("Loading Admin Data...");
-  
-  const candRes = await apiRequest({ action: "getCandidates" });
-  const driveRes = await apiRequest({ action: "getDrives" });
-  const appRes = await apiRequest({ action: "getApplications" });
+// Logout
+function logout() {
+  loggedInCandidateName = "";
+  currentCandidateEmail = "";
+  localStorage.clear();
+  switchView("loginView", "Placement Provider");
+}
 
+// ================= ADMIN FUNCTIONS =================
+
+async function fetchAdminData() {
+  showLoader("Loading Dashboard...");
+
+  // Fetch Candidates
+  const candRes = await apiRequest({ action: "getCandidates" });
   if (candRes.status === "success") {
     document.getElementById("totalCandidatesCount").innerText = candRes.data.length;
     let html = "";
@@ -220,17 +250,22 @@ async function fetchAdminData() {
         <td>${u.department || ''}</td>
         <td>${u.experience || ''}</td>
         <td>${u.relocate || ''}</td>
-        <td>${u.resume || '-'}</td>
+        <td>${u.resume ? '<a href="#" onclick="alert(\'Viewing resume directly from Sheet\')">View</a>' : '-'}</td>
         <td><span class="status-badge">${u.status || "In Process"}</span></td>
       </tr>`;
     });
     document.getElementById("candidateTableBody").innerHTML = html || "<tr><td colspan='10'>No candidates found</td></tr>";
   }
 
+  // Fetch Drives (just for count)
+  const driveRes = await apiRequest({ action: "getDrives" });
   if (driveRes.status === "success") {
-    document.getElementById("totalDrivesCount").innerText = driveRes.data.filter(d => d.status === "Active").length;
+    const activeCount = driveRes.data.filter(d => (d.status || "").toLowerCase() === "active").length;
+    document.getElementById("totalDrivesCount").innerText = activeCount;
   }
 
+  // Fetch Applications
+  const appRes = await apiRequest({ action: "getApplications" });
   if (appRes.status === "success") {
     let appHtml = "";
     appRes.data.forEach((app) => {
@@ -239,50 +274,78 @@ async function fetchAdminData() {
         <td><strong>${app.candidate_name || ''}</strong></td>
         <td>${app.company_name || ''}</td>
         <td>${app.job_title || ''}</td>
-        <td><span class="status-badge">${app.application_status || "Applied"}</span></td>
+        <td><span class="status-badge ${app.application_status || 'Applied'}">${app.application_status || "Applied"}</span></td>
       </tr>`;
     });
     document.getElementById("adminApplicationsTableBody").innerHTML = appHtml || "<tr><td colspan='5'>No applications found</td></tr>";
   }
-  
+
   hideLoader();
 }
 
-// ==================== FETCH FEEDBACK ====================
 async function fetchFeedbackData() {
   const res = await apiRequest({ action: "getFeedbackToSSInfotech" });
-  
+
   if (res.status === "success") {
     let feedbackHtml = "";
     let totalRating = 0;
+    
     res.data.forEach((fb) => {
-      totalRating += parseFloat(fb.avg_rating || 0);
+      const rating = parseFloat(fb.avg_rating || 0);
+      totalRating += rating;
+      
       feedbackHtml += `<tr>
         <td>${fb.feedback_date || '-'}</td>
         <td>${fb.candidate_name || ''}</td>
         <td>${fb.candidate_email || ''}</td>
-        <td>⭐ ${fb.avg_rating || 0}</td>
-        <td>${fb.q1 || 0}</td>
-        <td>${fb.q2 || 0}</td>
-        <td>${fb.q3 || 0}</td>
-        <td>${fb.q4 || 0}</td>
-        <td>${fb.q5 || 0}</td>
-        <td>${fb.q6 || 0}</td>
-        <td>${fb.q7 || 0}</td>
-        <td>${fb.q8 || 0}</td>
-        <td>${fb.q9 || 0}</td>
+        <td>⭐ ${rating}</td>
+        <td>${fb.q1 || 0}</td><td>${fb.q2 || 0}</td><td>${fb.q3 || 0}</td>
+        <td>${fb.q4 || 0}</td><td>${fb.q5 || 0}</td><td>${fb.q6 || 0}</td>
+        <td>${fb.q7 || 0}</td><td>${fb.q8 || 0}</td><td>${fb.q9 || 0}</td>
         <td>${fb.q10 || 0}</td>
         <td>${fb.comments || '-'}</td>
       </tr>`;
     });
+
     document.getElementById("feedbackTableBody").innerHTML = feedbackHtml || "<tr><td colspan='15'>No feedback found</td></tr>";
     document.getElementById("totalFeedbacks").innerText = res.data.length;
+    
     const avg = res.data.length > 0 ? (totalRating / res.data.length).toFixed(1) : 0;
     document.getElementById("avgRating").innerHTML = `⭐ ${avg}`;
   }
 }
 
-// ==================== FETCH HR APPLICATIONS (FIXED) ====================
+// ================= HR PARTNER FUNCTIONS =================
+
+// Post a new Drive
+document.getElementById("driveForm")?.addEventListener("submit", async function(e) {
+  e.preventDefault();
+  
+  const btn = e.target.querySelector("button");
+  setButtonLoading(btn, "Publishing...");
+  showLoader("Publishing Drive...");
+  
+  const res = await apiRequest({
+    action: "postDrive",
+    companyName: document.getElementById("compName").value,
+    hrName: document.getElementById("hrName").value,
+    jobTitle: document.getElementById("jobTitle").value,
+    eligibility: document.getElementById("eligibility").value,
+    description: document.getElementById("jobDesc").value
+  });
+  
+  hideLoader();
+  resetButton(btn);
+  
+  if (res.status === "success") {
+    alert("✅ Drive Published Successfully!");
+    e.target.reset();
+  } else {
+    alert("❌ Error: " + (res.message || "Failed to publish drive"));
+  }
+});
+
+// Fetch Applications for HR
 async function fetchHRApplications() {
   showLoader("Loading Applications...");
   const res = await apiRequest({ action: "getApplications" });
@@ -290,11 +353,11 @@ async function fetchHRApplications() {
   if (res.status === "success") {
     let html = "";
     res.data.forEach((app, idx) => {
-      // ===== FIX: Properly escape ALL fields for inline onclick =====
-      const candidateNameSafe = escapeForAttr(app.candidate_name || "");
-      const candidateEmailSafe = escapeForAttr(app.candidate_email || "");
-      const companyNameSafe = escapeForAttr(app.company_name || "");
-      const jobTitleSafe = escapeForAttr(app.job_title || "");
+      // ESCAPE STRINGS: Prevents JavaScript errors if names contain quotes (e.g. O'Connor)
+      const cName = escapeForAttr(app.candidate_name || "");
+      const cEmail = escapeForAttr(app.candidate_email || "");
+      const comp = escapeForAttr(app.company_name || "");
+      const job = escapeForAttr(app.job_title || "");
       
       html += `<tr>
         <td>${app.timestamp || '-'}</td>
@@ -313,7 +376,7 @@ async function fetchHRApplications() {
           </select>
         </td>
         <td>
-          <button class="save-btn" onclick='updateAppStatus(${idx}, "${candidateNameSafe}", "${candidateEmailSafe}", "${companyNameSafe}", "${jobTitleSafe}")'>
+          <button class="save-btn" style="padding:5px 10px; cursor:pointer;" onclick='updateAppStatus(${idx}, "${cName}", "${cEmail}", "${comp}", "${job}")'>
             <i class="fas fa-save"></i> Save
           </button>
         </td>
@@ -324,84 +387,98 @@ async function fetchHRApplications() {
   hideLoader();
 }
 
-// ==================== UPDATE APPLICATION STATUS (FIXED) ====================
+// Update Application Status
 window.updateAppStatus = async function(idx, candidateName, candidateEmail, companyName, jobTitle) {
   const select = document.getElementById(`statusSelect_${idx}`);
-  if (!select) {
-    alert("Error: Could not find status selector");
-    return;
-  }
+  if (!select) return;
   
   const newStatus = select.value;
   const btn = select.closest("tr").querySelector(".save-btn");
   
-  if (!confirm(`Update status of "${candidateName}" for "${jobTitle}" at "${companyName}" to "${newStatus}"?`)) {
-    return;
-  }
+  if (!confirm(`Update status for "${candidateName}" to "${newStatus}"?`)) return;
   
   setButtonLoading(btn, "Saving...");
   showLoader("Updating status...");
   
-  // ===== FIX: Now sending candidateEmail along with other fields =====
   const res = await apiRequest({
     action: "updateApplicationStatus",
     candidateName: candidateName,
-    candidateEmail: candidateEmail,     // <-- THIS WAS MISSING
+    candidateEmail: candidateEmail,
     companyName: companyName,
     jobTitle: jobTitle,
     newStatus: newStatus
   });
   
   hideLoader();
-  resetButton(btn, '<i class="fas fa-save"></i> Save');
+  resetButton(btn);
   
   if (res.status === "success") {
     alert("✅ " + res.message);
-    fetchHRApplications();
+    // Refresh table to show update (optional, or just keep local state)
+    // fetchHRApplications(); 
   } else {
     alert("❌ Error: " + (res.message || "Could not update status"));
-    // Log debug info if available
-    if (res.debug) {
-      console.error("Server Debug Info:", res.debug);
-    }
+    console.error("Debug:", res.debug);
   }
 };
 
-// ==================== FETCH ACTIVE DRIVES ====================
+// ================= CANDIDATE FUNCTIONS =================
+
+// Fetch Active Drives (FIXED)
 async function fetchActiveDrives() {
+  const gridContainer = document.getElementById("drivesGrid");
   showLoader("Loading Drives...");
+  gridContainer.innerHTML = '<p class="placeholder-text">Fetching opportunities...</p>';
+
   const res = await apiRequest({ action: "getDrives" });
   
   if (res.status === "success") {
-    const activeDrives = res.data.filter(d => d.status === "Active");
-    let grid = "";
-    activeDrives.forEach((d) => {
-      const companySafe = escapeForAttr(d.company_name || "");
-      const jobSafe = escapeForAttr(d.job_title || "");
-      
-      grid += `<div class="drive-card">
-        <h4>${d.job_title || ''}</h4>
-        <span class="company-badge"><i class="fas fa-building"></i> ${d.company_name || ''}</span>
-        <p><strong><i class="fas fa-graduation-cap"></i> Eligibility:</strong> ${d.eligibility || 'N/A'}</p>
-        <p><strong><i class="fas fa-file-alt"></i> Description:</strong> ${d.description || 'No description'}</p>
-        <p><strong><i class="fas fa-user-tie"></i> HR:</strong> ${d.hr_name || 'N/A'}</p>
-        <button class="apply-btn" onclick="applyToDrive('${companySafe}', '${jobSafe}')">
-          <i class="fas fa-paper-plane"></i> Quick Apply
-        </button>
-      </div>`;
+    console.log("Drives Data:", res.data);
+    
+    // Filter: Must be "Active" (case-insensitive)
+    const activeDrives = res.data.filter(d => {
+      const status = (d.status || "active").toString().toLowerCase().trim();
+      return status === "active";
     });
-    document.getElementById("drivesGrid").innerHTML = grid || "<p class='placeholder-text'>No active drives available</p>";
+
+    if (activeDrives.length > 0) {
+      let grid = "";
+      activeDrives.forEach((d) => {
+        // Escape strings for HTML safety
+        const cSafe = (d.company_name || "").replace(/'/g, "&#39;");
+        const jSafe = (d.job_title || "").replace(/'/g, "&#39;");
+        const desc = (d.description || "No description.").replace(/'/g, "&#39;");
+        const elig = (d.eligibility || "N/A").replace(/'/g, "&#39;");
+
+        grid += `<div class="drive-card">
+          <h4>${jSafe}</h4>
+          <span class="company-badge"><i class="fas fa-building"></i> ${cSafe}</span>
+          <p><strong><i class="fas fa-graduation-cap"></i> Eligibility:</strong> ${elig}</p>
+          <p class="desc"><strong><i class="fas fa-info-circle"></i> Description:</strong> ${desc}</p>
+          <p style="font-size:0.9rem; color:#666; margin-top:5px;"><strong>HR:</strong> ${d.hr_name || 'N/A'}</p>
+          <button class="apply-btn" onclick="applyToDrive('${cSafe}', '${jSafe}')">
+            <i class="fas fa-paper-plane"></i> Quick Apply
+          </button>
+        </div>`;
+      });
+      gridContainer.innerHTML = grid;
+    } else {
+      gridContainer.innerHTML = `
+        <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #7f8c8d;">
+          <i class="fas fa-folder-open" style="font-size: 3rem; margin-bottom: 15px;"></i>
+          <p>No active drives found at the moment.</p>
+        </div>`;
+    }
+  } else {
+    gridContainer.innerHTML = `<p style="color:red; text-align:center;">Error loading drives: ${res.message}</p>`;
   }
   hideLoader();
 }
 
-// ==================== APPLY TO DRIVE ====================
+// Apply to a Drive
 window.applyToDrive = async function(company, jobTitle) {
-  const candidateName = localStorage.getItem("candidateName");
-  const candidateEmail = localStorage.getItem("candidateEmail");
-  
-  if (!candidateName) {
-    alert("Please login again");
+  if (!loggedInCandidateName) {
+    alert("Session expired. Please login again.");
     logout();
     return;
   }
@@ -409,8 +486,8 @@ window.applyToDrive = async function(company, jobTitle) {
   showLoader("Submitting Application...");
   const res = await apiRequest({
     action: "submitApplication",
-    candidateName: candidateName,
-    candidateEmail: candidateEmail,
+    candidateName: loggedInCandidateName,
+    candidateEmail: currentCandidateEmail,
     companyName: company,
     jobTitle: jobTitle
   });
@@ -424,14 +501,10 @@ window.applyToDrive = async function(company, jobTitle) {
   }
 };
 
-// ==================== SUBMIT FEEDBACK ====================
+// Submit Feedback
 window.submitFeedbackToSSInfotech = async function() {
-  const candidateName = localStorage.getItem("candidateName");
-  const candidateEmail = localStorage.getItem("candidateEmail");
-  
-  if (!candidateName) {
+  if (!loggedInCandidateName) {
     alert("Please login first!");
-    logout();
     return;
   }
 
@@ -455,8 +528,8 @@ window.submitFeedbackToSSInfotech = async function() {
 
   const res = await apiRequest({
     action: "addFeedbackToSSInfotech",
-    candidateName: candidateName,
-    candidateEmail: candidateEmail,
+    candidateName: loggedInCandidateName,
+    candidateEmail: currentCandidateEmail,
     q1: ratings[0], q2: ratings[1], q3: ratings[2], q4: ratings[3], q5: ratings[4],
     q6: ratings[5], q7: ratings[6], q8: ratings[7], q9: ratings[8], q10: ratings[9],
     avgRating: avgRating,
@@ -464,58 +537,30 @@ window.submitFeedbackToSSInfotech = async function() {
   });
   
   hideLoader();
-  resetButton(btn, '<i class="fas fa-paper-plane"></i> Submit Feedback to SS Infotech');
+  resetButton(btn);
 
   if (res.status === "success") {
     alert("✅ Thank you for your feedback!");
-    for (let i = 1; i <= 10; i++) {
-      document.getElementById(`q${i}`).value = "0";
-    }
+    // Reset form
+    for (let i = 1; i <= 10; i++) document.getElementById(`q${i}`).value = "0";
     document.getElementById("additionalComments").value = "";
   } else {
     alert("❌ " + (res.message || "Failed to submit feedback"));
   }
 };
 
-// ==================== CREATE DRIVE (HR) ====================
-document.getElementById("driveForm")?.addEventListener("submit", async function(e) {
-  e.preventDefault();
-  
-  const btn = e.target.querySelector("button");
-  setButtonLoading(btn, "Publishing...");
-  showLoader("Publishing Drive...");
-  
-  const res = await apiRequest({
-    action: "postDrive",
-    companyName: document.getElementById("compName").value,
-    hrName: document.getElementById("hrName").value,
-    jobTitle: document.getElementById("jobTitle").value,
-    eligibility: document.getElementById("eligibility").value,
-    description: document.getElementById("jobDesc").value
-  });
-  
-  hideLoader();
-  resetButton(btn, '<i class="fas fa-bullhorn"></i> Publish Drive');
-  
-  if (res.status === "success") {
-    alert("✅ Drive Published Successfully!");
-    e.target.reset();
-  } else {
-    alert("❌ " + (res.message || "Failed to publish drive"));
-  }
-});
+// ================= UTILITIES =================
 
-// ==================== ESCAPE FOR HTML ATTRIBUTE ====================
+// Escape strings for use inside HTML attributes (e.g. onclick='...')
 function escapeForAttr(str) {
   return str
     .replace(/\\/g, "\\\\")
     .replace(/'/g, "\\'")
     .replace(/"/g, "&quot;")
-    .replace(/\n/g, " ")
-    .replace(/\r/g, "");
+    .replace(/\n/g, " ");
 }
 
-// ==================== EXPORT TABLE ====================
+// Export Table to Excel (CSV)
 function exportTableToExcel(tableBodyId, filename) {
   const tbody = document.getElementById(tableBodyId);
   if (!tbody || tbody.querySelectorAll("tr").length === 0) {
@@ -543,7 +588,7 @@ function exportTableToExcel(tableBodyId, filename) {
   URL.revokeObjectURL(link.href);
 }
 
-// ==================== FILTER TABLE ====================
+// Search/Filter Table
 function filterTable(tbodyId, query) {
   const rows = document.querySelectorAll(`#${tbodyId} tr`);
   const q = query.toLowerCase();
@@ -552,7 +597,7 @@ function filterTable(tbodyId, query) {
   });
 }
 
-// ==================== SEARCH LISTENERS ====================
+// Attach Search Listeners
 document.getElementById("adminCandidateSearch")?.addEventListener("input", function() {
   filterTable("candidateTableBody", this.value);
 });
@@ -566,7 +611,7 @@ document.getElementById("feedbackSearch")?.addEventListener("input", function() 
   filterTable("feedbackTableBody", this.value);
 });
 
-// ==================== RESTORE SESSION ====================
+// ================= INITIALIZATION =================
 window.onload = () => {
   const role = localStorage.getItem("userRole");
   if (role === "admin") {
